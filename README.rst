@@ -301,8 +301,8 @@ You want to run this using test mode via *-t* to see what it would do. For examp
     dual-root-tool -st
     dual-root-tool -bt
 
-Now is a good time to reboot - all should work and you should have /boot from the actively booted
-<esp>.
+Now is a good time to reboot - all should work and you should have /boot bind mounted
+from the actively booted <esp>.
 
 
 Syncing ESPs
