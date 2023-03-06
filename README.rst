@@ -166,14 +166,18 @@ To continue we'll use temporary mounts::
     mount --bind /mnt/root/efi0 /mnt/root/boot 
 
 At this point either use arch-chroot and install as usual or rsync from an appropriate backup. 
-With this set up the efi is to be mounted bind /boot. We use a bind mount of efi0 onto /boot.
-We will always mount both <esp> partitions under /efi0 and /efi1. We will also be bind 
-mounting one of them onto /boot for convenience.
+With this set up the efi is then bind mounted onto /boot. For our example
+we bind mount efi0 onto /boot.
 
-If you're pulling from backup then regenerate all initrds to be sure they are consistent
+We will always mount both <esp> partitions under /efi0 and /efi1. In addition
+we bind mount one of them onto /boot for convenience. The goal is to have
+the currently booted <esp> bind mounted onto /boot - which is the standard
+place for kernels and initrds to be installed.
+
+If you're pulling from a backup then regenerate all initrds to be sure they are consistent
 with the current set up. Don't skip this step :)
 
-Make sure that the systemd-loader entries, located in /mnt/root/boot/efi/loader/entries
+Make sure the systemd-loader entries, located in /mnt/root/boot/efi/loader/entries
 have the correct option root line. In our example the load entry for arch kernel
 would be::
 
@@ -183,9 +187,9 @@ would be::
     initrd  /intel-ucode.img 
     options root="UUID=a8426465-b755-429d-9604-9c77c2838fda" rootfstype=btrfs rw audit=0
 
-As you see the UUID is the btrfs one shown above.
+As you can see the root UUID is that of the btrfs one shown above.
 
-We now use systemd bootctl to install both <esp>s::
+We now use systemd's bootctl to install both <esp>s::
 
     bootctl --efi-boot-option-description='Linux esp 1' --esp-path /mnt/root/efi1 install
     bootctl --efi-boot-option-description='Linux esp 0' --esp-path /mnt/root/efi0 install
@@ -196,16 +200,16 @@ The second line could just as well be::
 
 Doing it in this order makes the boot order efi0 then efi1. 
 
-Now run bootctl to check everything looks good and check boot order::
+Now run bootctl to check everything looks good and also use *efibootmgr* to 
+check the boot order::
     
     bootctl --esp-path /mnt/root/efi0 status
     bootctl --esp-path /mnt/root/efi1 status
     efibootmgr
 
-Now we still need to adjust the new /mnt/root/etc/fstab. In the fstab we will
-mount both efi partitions. Later we will create a mechanism to bind mount
-whichever <esp> was used onto /boot. Before we do this lets test to make sure
-it boots okay.
+We still need to adjust the new /mnt/root/etc/fstab. In this fstab we will
+mount both efi partitions. Later we will set up a mechanism to bind mount
+whichever <esp> was used to boot the machine to /boot. 
 
 Adjust the /mnt/root/fstab to mount each <esp> under /efi0 andf /efi1
 And mount the btrfs root onto /.  You can get the mounts to use by::
@@ -225,36 +229,41 @@ In our case fstab looks like ::
     UUID=6C48-1623 /efi1 vfat  rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=iso8859-1,shortname=mixed,utf8,errors=remount-ro    0 0
 
     
-Delete the mount of /boot. We will come back to this later after we have a 
-mechanism to decide which of the 2 <esp> to bind mount onto /boot.
+Delete the mount of /boot - we dont want or need this. 
+We will come back to this shortly after and show how to automatically 
+have the right currently booted <esp> bind mounted to /boot.
 
-You can update the system before booting (provided /boot is still bind mounted)
-and be good to install the dual-root-tool script and bind-mount-efi.service file.
-For Arch users you also install the package from aur.
+You can update the system before booting (provided /boot is still bind mounted of course)
+and it would be good to install the dual-root-tool script and bind-mount-efi.service file
+provided here.  For Arch users you can also install the aur package.
 
 Before we boot let's regenerate the initrds - this will of course only work
 provided the active efi is still bind mounted onto /boot as per above.
+Sorry to be repetitive but its important to avoid mistakes.
 
-All being well you should be able to boot the system or you can add the automatic
-bind mount of the currently booted esp onto /boot, as desribed in next section before booting. 
+All being well you should be able to boot the system now or if you prefer
+you can do the next step which adds the automatic bind mount of the currently booted esp onto /boot.
+This is desribed in next section.
 
-Ths will deal mounting */boot* as well syncing the efi partitions. Hadnling
-this was the most the tricky part! 
+Ths tool will handle mounting */boot* as well syncing the alternate efi partitions. 
+Handling this in a robust and safe way, was the most tricky part of the exercise! 
 
 
 Mounting /boot 
 --------------
 
-This is a little challenging to do. I was really hoping *bootctl -p* would provdei 
+This was a little challenging to do properly. I had really hoped *bootctl -p* would provide 
 a reliable way to detect which <esp> was used for current boot, but that didn't
-seem to be the case. So, instead I wrote a script to identify which <esp> was 
-used to boot the system and then bind mount that <esp> onto /boot. 
+seem to be the case. So, instead I wrote the *dual-boot-tool* script.
+It identifies which <esp> was used to boot the system and can bind mount that <esp> onto /boot. 
 
-We provide a tool and a systemd service to take care of this [5]_.
+We also provide a systemd service unit to make this all work smoothly [5]_.
 
-So whats needed is to have the script in */usr/bin/dual-root-tool*
-and the systemd service file in */etc/systemd/system/bind-mount-efi.service*. 
-(or /usr/lib/systemd/system if you prefer)
+Whats needed is to::
+
+    * install the script in */usr/bin/dual-root-tool*
+    * install  systemd service file in */etc/systemd/system/bind-mount-efi.service*   
+       or to /usr/lib/systemd/system if you prefer
 
 Now enable the service with the usual incantation::
 
