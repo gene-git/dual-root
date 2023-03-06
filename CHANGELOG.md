@@ -1,5 +1,9 @@
 # Changelog
 
+## [0.6.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-03-06
+ - Add sphinx docs - cd docs; make latexpdf; make html  
+ - update CHANGELOG.md  
+
 ## [0.5.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-03-06
  - tweak doc, update to 0.5.0  
  - More edits for dual-root-tool  
