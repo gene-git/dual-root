@@ -67,7 +67,7 @@ type XBOOTLDR it may or may not work.
 
 
 Second Approach:
- - best suited with minimal change upgrade  existsing system
+ - best suited to upgrade existing system with minimal changes
  - syncing <esp, boot, root, usr and possibly var
  - dynamic areas (e.g. var) should preferably be on a RAID array.
    Especially if there are things like mail or databses running.
@@ -271,13 +271,16 @@ dual-root-tool
 Couple of notes on the *dual-root-tool*.
 This version is written in python, as I found doing it in bash unpleasant and I think 
 this is too complex for a bash script; though I am sure there are folks more skilled 
-than me that could make a bash version.  I think it wouldn't be a bad idea to have
-a version of dual-boot-tool written in C. But the python works, and who doesn't 
-have python these days!
+than me that could make a bash version.  
 
-The *bind-mount-efi.service* uses */usr/bin/dual-root-tool* to do all the real work.
+I think it wouldn't be a bad idea to have a version of dual-boot-tool 
+written in C++ or C. But the python works, and who doesn't 
+have python installed these days!
+
+The *bind-mount-efi.service* uses */usr/bin/dual-root-tool* do all the real work.
 If *dual-root-tool* is run with no arguments, it prints information about the 
-currently booted <esp>. 
+currently booted <esp>. You should run this to confirm it does the right 
+thing on your system(s).
 
 It also supports a "-b" option to bind mount */boot* - this is what the
 *bind-mount-efi.service* uses. 
@@ -293,25 +296,27 @@ Syncing ESPs
 -------------
 
 Now that we know the active <esp> we are able to sync the other <esp> from that one.
-This is done by using the sync option of the dual-root-tool::
 
-    dual-root-tool -s
-
-You can use use the output of *dual-root-tool* with  no arguments to identify the
-current booted esp - then you can also simeply use rsync. For example if the 
-current booted efi is /efi0, then you can update using::
+You can use use the output of *dual-root-tool* with no arguments to identify the
+current booted esp - then use rsync to update the alternate <esp>. For example if the 
+current booted <esp> is mounted on */efi0*, and the alternate is on */efi1*,
+then you can update the latter using::
 
     rsync -v -axHAX --exclude=/lost+found/ --delete /efi0/* /efi1/
 
-This can be run manually or in Arch by using a pacman hook triggered on /boot. 
-Another method is to use inotify. This requires installing inotify-tools.
+This can also done by using the sync option of the dual-root-tool::
 
-Coming soon - inotify based systemd service. 
+    dual-root-tool -s
 
-Copy the duel-root-sync.service file to /etc/systemd/systemd and enable and start it.
-This monitors /boot for changes and calls *dual-root-tool -s* to sync the
-other <esp> whenever an event is detected.
+This can be run manually or by using a pacman hook (Arch Linux) triggered by
+changes to /boot.  Another way is to use inotify. This can be done by
+installing inotify-tools.
 
+*Coming soon - inotify based systemd service*
+
+Copy the duel-root-sync.service file to /etc/systemd/systemd and enable and start as usual
+This monitors /boot for changes and calls *dual-root-tool -s* to sync active <esp> to the
+alternate <esp> whenever an event is detected.
 
 
 Second Approach
@@ -667,8 +672,4 @@ License
 
  - SPDX-License-Identifier: MIT
  - Copyright (c) 2023 Gene C 
-
-
-
-
 
