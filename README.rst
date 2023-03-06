@@ -302,7 +302,7 @@ current booted esp - then use rsync to update the alternate <esp>. For example i
 current booted <esp> is mounted on */efi0*, and the alternate is on */efi1*,
 then you can update the latter using::
 
-    rsync -v -axHAX --exclude=/lost+found/ --delete /efi0/* /efi1/
+    rsync -v -axHAX --exclude=/lost+found/ --delete /efi0/ /efi1/
 
 This can also done by using the sync option of the dual-root-tool::
 
@@ -666,6 +666,7 @@ End Notes
 .. [3] https://lists.archlinux.org/archives/list/arch-general@lists.archlinux.org/thread/KAMOXQTWQCPCC5KNFF6IOUSFPMNMLIIW/
 .. [4] https://0pointer.net/blog/ 
 .. [5] Code on github and available as an Arch aur package.
+       https://aur.archlinux.org/packages/dual-root
 
 License
 ========

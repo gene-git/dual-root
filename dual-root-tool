@@ -77,6 +77,19 @@ def device_to_uuid_mount(dev):
             mount = item[0]
         mounts.append(mount)
     return (uuid, mounts)
+
+def os_scandir(tdir):
+    """
+    wrapper around scandir with exception hadnling
+    """
+    scan = None
+    if os.path.exists(tdir) and os.path.isdir(tdir) :
+        try:
+            scan = os.scandir(tdir)
+        except OSError as _error:
+            scan = None
+    return scan
+
 # ----------------------------------------------------------------------------------------------
 
 class Esp:
@@ -173,21 +186,26 @@ class EspInfo:
      Support bind mounting current <esp> onto efi_mount (/boot)
      Support rsync current to alternate esp
     """
-    def __init__(self, efi_mount):
+    def __init__(self, conf):
         #
         # esp is the currently booted esp.
         # Alternate esp's are listed in esp_alt
         #
+        self.test = conf['test']
         self.esp = Esp()
         self.esp_alt = []
 
-        self.efi_mount = efi_mount
+        self.efi_mount = conf['efi_mount']
         self.efi_mount_uuid = None
         self.efi_mounted = False
         self.efi_uuid_correct = False
+        self.euid = os.geteuid()
+        self.dual_root_mount_list = []
 
         self.efi_mount_uuid = self.find_efi_mount_uuid(self.efi_mount)
         self.is_efi_mounted()
+
+        self.efi_other = []     # list of all mounts /efiN
 
     def find_efi_mount_uuid(self, efi_mount):
         """
@@ -246,11 +264,10 @@ class EspInfo:
             else:
                 print(f'{self.efi_mount} mounted but uuid wrong - should be {self.esp.uuid}')
         elif not self.esp.mount:
-            print(f'Not dual root, bind mount skipped: esp not mounted at /efi0,/efi1 ...')
+            print('Not dual root, bind mount skipped: esp not mounted at /efi0,/efi1 ...')
         else:
             print(f'mount --bind {self.esp.mount} {self.efi_mount}')
-            euid = os.geteuid()
-            if euid == 0:
+            if self.euid == 0 and not self.test:
                 pargs = ['/usr/bin/mount', '--bind', self.esp.mount, self.efi_mount]
                 [retc, _out, err] = run_prog(pargs)
                 if retc != 0:
@@ -258,29 +275,98 @@ class EspInfo:
             else:
                 print('Must be root to use bind mount')
 
+    def dual_root_mounts(self):
+        """
+        Make a list of all the mounts names /efi<N>
+         - Should we exclude booted /efi<n>
+        """
+        self.dual_root_mount_list = []
+        #booted_efi = self.esp.mount
+
+        root_scan = os_scandir('/')
+        if not root_scan:
+            return
+
+        for item in root_scan:
+            path = item.path
+            if path.startswith('/efi') and len(path) > 4:
+                self.dual_root_mount_list.append(path)
+
+
+    def sync_alt_efi(self):
+        """
+        Sync the current booted esp to other esps
+        If /efi0 is current then sync
+          - /efi0/* -> /efiN for N != 0
+        """
+        opts = []
+        if self.test:
+            opts += ['-nv']
+        opts += ['-axHAX', '--exclude=/lost+found/', '--delete']
+        rsync = ['/usr/bin/rsync'] + opts
+
+        self.dual_root_mounts()
+        current_efi = self.esp.mount
+        all_dual_mounts = self.dual_root_mount_list
+
+        if not all_dual_mounts:
+            print('Not dual root (/afi<n> not found) -  nothing to sync')
+            return
+
+        if len(all_dual_mounts) == 1:
+            this_efi = all_dual_mounts[0]
+            print(f'Only 1 dual root esp found ({this_efi}) -  nothing to sync')
+            return
+
+        for this_efi in all_dual_mounts:
+            if this_efi != current_efi:
+                pargs = rsync + [f'{current_efi}/', f'{this_efi}/']
+                cmd = ' '.join(pargs)
+                print(cmd)
+
+                [retc, out, err] = run_prog(pargs)
+                if retc != 0:
+                    print(f'rsync failed: {current_efi}/ -> {this_efi}/')
+                    print(err)
+                elif self.test and out:
+                    print(out)
+
 def parse_args():
     """
     Command line requests
     """
     desc = 'dual-root-tool : dual <esp> management tool'
-    do_bind = False
-    do_sync = False
+
+    bind = False
+    sync = False
+    test = False
     efi_mount = '/boot'
 
     par = argparse.ArgumentParser(description=desc)
     par.add_argument('-b', '--bind', action='store_true', help='Bind mount active esp to efi mount')
     par.add_argument('-s', '--sync', action='store_true', help='Sync active efi to alternate')
+    par.add_argument('-t', '--test', action='store_true', help='Test mode')
     par.add_argument('efi_mount', nargs='?', default=efi_mount,
                      help=f'Where to bind mount active esp ({efi_mount})')
     parsed = par.parse_args()
     if parsed:
         if parsed.bind:
-            do_bind = parsed.bind
+            bind = parsed.bind
         if parsed.sync:
-            do_sync = parsed.sync
+            sync = parsed.sync
+        if parsed.test:
+            test = parsed.test
+
         efi_mount = parsed.efi_mount
 
-    return (do_bind, do_sync, efi_mount)
+    conf = {
+            'bind'   : bind,
+            'sync'   : sync,
+            'test'   : test,
+            'efi_mount' : efi_mount,
+            }
+
+    return conf
 
 #import pdb
 def main():
@@ -297,15 +383,15 @@ def main():
          efi_mount     : where to mount the active esp - default is /boot
     """
     #pdb.set_trace()
-    (do_bind, do_sync, efi_mount) = parse_args()
+    conf = parse_args()
 
-    esp = EspInfo(efi_mount)
+    esp = EspInfo(conf)
     esp.print_info()
 
-    if do_bind:
+    if conf["bind"]:
         esp.bind_mount_efi()
-    if do_sync:
-        print('Sync not suppoered yet')
+    if conf["sync"]:
+        esp.sync_alt_efi()
 
 if __name__ == '__main__':
     main()
