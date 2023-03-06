@@ -234,6 +234,18 @@ class EspInfo:
 
         return efi_mount_uuid
 
+    def is_efi_current_boot(self, efi):
+        """
+        Check if efi als the currently booted esp
+        """
+        if not efi:
+            return False
+
+        if self.esp.mount_list and efi in self.esp.mount_list:
+            return True
+
+        return False
+
     def is_efi_mounted(self):
         """
         Check if efi_mount (aka /boot) mounted and if UUID we want
@@ -319,7 +331,7 @@ class EspInfo:
             return
 
         for this_efi in all_dual_mounts:
-            if this_efi != current_efi:
+            if this_efi != current_efi and not self.is_efi_current_boot(this_efi):
                 pargs = rsync + [f'{current_efi}/', f'{this_efi}/']
                 cmd = ' '.join(pargs)
                 print(cmd)
