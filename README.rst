@@ -54,6 +54,8 @@ First Approach:  [1]_
  - If existing root drive is the 3rd drive, downtime here is also kept to minimum.
  - If using SSD, then its best if both drives are SSDs for raid
  - Which ever disk's <esp> is used to boot, share same loader configs
+ - best when disks been combined with btrfs raid are simiar.
+   2 nvme is good, but I'd avoid raiding a fast nvme ssd with a slow spinner.
 
 
 For those who prefer to keep their kernels on a linux filesystem,
