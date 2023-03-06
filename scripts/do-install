@@ -2,15 +2,15 @@
 # SPDX-License-Identifier: MIT
 # Copyright (c) 2022,2023 Gene C
 #
-# installer script for dual-tools
+# installer script for dual-root 
 # e.g. Call from PKGBUILD:  
 #   ./do-install ${pkgdir}
 # gene c (2023)
 #
 dest="$1"
-self="dual-tool"
+self="dual-root"
 
-info="README.rst CHANGELOG.md scripts packaging bind-mount-efi.service dual-root-tool"
+info="README.rst Install.rst CHANGELOG.md scripts packaging bind-mount-efi.service dual-root-tool"
 infodir="/usr/share/${self}"
 
 license="LICENSE"
