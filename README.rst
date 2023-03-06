@@ -223,70 +223,83 @@ In our case fstab looks like ::
     UUID=6C48-1623 /efi1 vfat  rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=iso8859-1,shortname=mixed,utf8,errors=remount-ro    0 0
 
     
-Delete the mount of /boot. We will come
-back to this later after we have a mechanism to decide which of the 2 <esp> to
-bind mount onto /boot.
+Delete the mount of /boot. We will come back to this later after we have a 
+mechanism to decide which of the 2 <esp> to bind mount onto /boot.
 
-Before we go ahead and boot let's regenerate the initrds - this will of course only work
-provided the active efi was bind mounted onto /boot as per above.
+You can update the system before booting (provided /boot is still bind mounted)
+and be good to install the dual-root-tool script and bind-mount-efi.service file.
+For Arch users you also install the package from aur.
 
-All being well you should be able to boot the system. Next we will deal mounting */boot* and
-syncing the efi partitions - the tricky bit! You don't need to reboot at this point,
-you can continue to the next section where we provide an automatic mechanism to
-have the whichever <esp> was booted to be bind mounted on /boot.
+Before we boot let's regenerate the initrds - this will of course only work
+provided the active efi is still bind mounted onto /boot as per above.
+
+All being well you should be able to boot the system or you can add the automatic
+bind mount of the currently booted esp onto /boot, as desribed in next section before booting. 
+
+Ths will deal mounting */boot* as well syncing the efi partitions. Hadnling
+this was the most the tricky part! 
 
 
 Mounting /boot 
 --------------
 
-This is a little tricky. I was hoping bootctl -p would be a reliable way to detect which
-<esp> was used for current boot, but I didn't find a reliable way. Instead I wrote a little script
-to identfify which <esp> was used and mount then bind mount it onto /boot. 
+This is a little challenging to do. I was really hoping *bootctl -p* would provdei 
+a reliable way to detect which <esp> was used for current boot, but that didn't
+seem to be the case. So, instead I wrote a script to identify which <esp> was 
+used to boot the system and then bind mount that <esp> onto /boot. 
 
 We provide a tool and a systemd service to take care of this [5]_.
 
-So whats needed is to install the script in */usr/bin/dual-root-tool*
-Then copy the systemd service file to */etc/systemd/system/bind-mount-efi.service*. 
-Then enable the service with the usual incantation::
+So whats needed is to have the script in */usr/bin/dual-root-tool*
+and the systemd service file in */etc/systemd/system/bind-mount-efi.service*. 
+(or /usr/lib/systemd/system if you prefer)
+
+Now enable the service with the usual incantation::
 
     systemctl enable bind-mount-efi.service
 
-Next add a mount option to both the efi0 and efi1 mount lines in /etc/fstab 
-(or /mnt/root/etc/fstab if you have not booted machine yet). In my example, the efi0 line 
-gets additional option: x-systemd.before=bind-mount-efi.service. 
+Next add a mount option to both the efi0 and efi1 mount lines in */etc/fstab* 
+(NB or /mnt/root/etc/fstab if you have not booted machine yet). 
+
+In my example, the efi0 line gets additional option: x-systemd.before=bind-mount-efi.service. 
 And the same for efi1 naturally::
 
     UUID=6B7E-A837 /efi0 vfat rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=iso8859-1,shortname=mixed,utf8,errors=remount-ro,x-systemd.before=bind-mount-efi.service 0 0
 
 This will ensure both */efi0* and */efi1* are mounted before the *bind-mount-efi* service,
-which probes these mounts are part of its serivce to determine which of the 2 was used
-to boot the system. Armed with that information, then the active <esp> is mounted on */boot*.
+which uses *dual-root-tool -b* to determine which 2 <esp> was used
+to boot the system. Armed with that information, then the active <esp> is then mounted on */boot*.
 
-Now that we have */boot* holding the 'actively booted' efi. We have overcome 
-what we belive to be the trickiest part of making this work correctly.
+Now that we have */boot* holding the 'actively booted' <esp>. We have overcome 
+what we believe to be the trickiest part of making this work correctly.
 
 dual-root-tool
 --------------
 
-Couple of notes on the *dual-root-tool*.
+Couple of notes on the *dual-root-tool* itself
+.
 This version is written in python, as I found doing it in bash unpleasant and I think 
-this is too complex for a bash script; though I am sure there are folks more skilled 
+far too complex for a bash script; though I am sure there are folks more skilled 
 than me that could make a bash version.  
 
 I think it might be a good idea to have a version of dual-boot-tool 
-written in C++ or C. As of now, the python works, and besides, who doesn't 
-have python installed these days!
+written in C++ or C at some point. That said, As of now, the python works, 
+and besides, who doesn't have python installed these days!
 
-The *bind-mount-efi.service* uses */usr/bin/dual-root-tool* do all the real work.
+The *bind-mount-efi.service* uses */usr/bin/dual-root-tool* to do all the real work.
+
 If *dual-root-tool* is run with no arguments, it prints information about the 
 currently booted <esp>. You should run this to confirm it does the right 
 thing on your system(s).
 
-It also supports a "-b" option to bind mount */boot* - this is what the
+It also supports a *-b* option to bind mount */boot* - this is what the
 *bind-mount-efi.service* uses. 
 
-It will also be used in the next section to sync the current booted <esp> to the 
-alternate <esp> using the *-s* option.
+Lasty it has a *-s* option to sync the active <esp> onto the alternate <esp>s.
+You want to run this using test mode via *-t* to see what it would do. For example::
+
+    dual-root-tool -st
+    dual-root-tool -bt
 
 Now is a good time to reboot - all should work and you should have /boot from the actively booted
 <esp>.
