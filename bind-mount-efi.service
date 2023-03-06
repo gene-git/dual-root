@@ -1,0 +1,16 @@
+[Unit]
+Description=Dual Root bind mount currently booted <esp> to /boot
+ConditionPathExists=/usr/bin/dual-root-tool
+DefaultDependencies=no
+Conflicts=shutdown.target
+After=local-fs-pre.target
+Before=local-fs.target shutdown.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/dual-root-tool -b
+RemainAfterExit=yes
+
+[Install]
+WantedBy=local-fs.target
+

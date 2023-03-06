@@ -273,8 +273,8 @@ This version is written in python, as I found doing it in bash unpleasant and I 
 this is too complex for a bash script; though I am sure there are folks more skilled 
 than me that could make a bash version.  
 
-I think it wouldn't be a bad idea to have a version of dual-boot-tool 
-written in C++ or C. But the python works, and who doesn't 
+I think it might be a good idea to have a version of dual-boot-tool 
+written in C++ or C. As of now, the python works, and besides, who doesn't 
 have python installed these days!
 
 The *bind-mount-efi.service* uses */usr/bin/dual-root-tool* do all the real work.

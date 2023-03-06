@@ -1,0 +1,48 @@
+#!/bin/bash
+# SPDX-License-Identifier: MIT
+# Copyright (c) 2022,2023 Gene C
+#
+# installer script for dual-tools
+# e.g. Call from PKGBUILD:  
+#   ./do-install ${pkgdir}
+# gene c (2023)
+#
+dest="$1"
+self="dual-tool"
+
+info="README.rst CHANGELOG.md scripts packaging bind-mount-efi.service dual-root-tool"
+infodir="/usr/share/${self}"
+
+license="LICENSE"
+licensedir="/usr/share/licenses/${self}"
+
+#units='dual-root-sync.service'
+units='bind-mount-efi.service'
+unitdir='/usr/lib/systemd/system/'
+apps=('dual-root-tool')
+
+# so can make app link in /usr/bin
+
+if [ ! -d "$dest" ] ; then
+    echo 'Missing destination directory'
+    exit 1
+else
+    # shared
+    /usr/bin/rsync --mkpath -a ${info} ${dest}${infodir}
+    /usr/bin/rsync --mkpath -a ${license} ${dest}/${licensedir}/${license}
+
+    # systemd units 
+    /usr/bin/mkdir -p ${dest}/${unitdir}
+    /usr/bin/rsync -a ${units} ${dest}/${unitdir}/
+
+    # Executable
+    if [ -v apps ] ; then
+        /usr/bin/mkdir -p "${dest}/usr/bin"
+        for app in ${apps[@]}
+        do
+            /usr/bin/rsync ${app} ${dest}/usr/bin/${app}
+        done
+    fi
+    exit 0
+fi
+
