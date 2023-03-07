@@ -70,7 +70,7 @@ type XBOOTLDR it may or may not work.
 
 Second Approach:
  - best suited to upgrade existing system with minimal changes
- - syncing <esp, boot, root, usr and possibly var
+ - syncing <esp>, boot, root, usr and possibly var
  - dynamic areas (e.g. var) should preferably be on a RAID array.
    Especially if there are things like mail or databses running.
    What I do is keep these on separate RAID-6 and bind mount them into var
@@ -86,10 +86,6 @@ We find the Arch rolling release distro convenient and robust.
 
 One of the beautiful things about linux is that, more often than not, there is more than
 one way to do things.  And here is one way :)
-
-**Todo** ::
-
-    Create Inotify based sync tool to improve on the simple sync script below.
 
 First Approach
 ================
