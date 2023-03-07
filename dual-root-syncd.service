@@ -1,0 +1,14 @@
+[Unit]
+Description=Dual Root Sync Damon - keeps alernate <esp>s in sync
+ConditionPathExists=/usr/bin/dual-root-tool
+DefaultDependencies=no
+Conflicts=shutdown.target
+After=local-fs.target bind-mount-efi.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/dual-root-tool -sd -q
+
+[Install]
+WantedBy=multi-user.target
+
