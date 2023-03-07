@@ -86,7 +86,8 @@ def _popen_inotify(watchdir):
 
 def _inotify_event_handler(espinfo, pipe):
     """
-    Monitors the inotify output and calles event_prog on result
+    Monitors the inotify output 
+     - on event notifiy, run one time sync using espinfo.sync_alt_efi()
     """
     global Inotify_Pipe
     if pipe is None:
