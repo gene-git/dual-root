@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.9.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-03-07
+ - Add -q quiet option to dual-root-tool  
+   update Install.rst instructions  
+   Install uses /etc/dual-root  
+   tidy up installer  
+ - small doc edits  
+ - update CHANGELOG.md  
+
 ## [0.7.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-03-06
  - fix installer typo  
  - update CHANGELOG.md  
