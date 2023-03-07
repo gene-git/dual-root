@@ -192,6 +192,7 @@ class EspInfo:
         # Alternate esp's are listed in esp_alt
         #
         self.test = conf['test']
+        self.quiet = conf['quiet']
         self.esp = Esp()
         self.esp_alt = []
 
@@ -260,8 +261,9 @@ class EspInfo:
 
     def print_info(self):
         """ print useful info """
-        print(f'Booted esp : {self.esp.dev} : {self.esp.mount_list} : {self.esp.uuid}')
-        #print(f'Boot mount : {self.efi_mount} : {self.efi_mount_uuid}')
+        if not self.quiet:
+            print(f'Booted esp : {self.esp.dev} : {self.esp.mount_list} : {self.esp.uuid}')
+            #print(f'Boot mount : {self.efi_mount} : {self.efi_mount_uuid}')
 
     def bind_mount_efi(self):
         """
@@ -333,8 +335,9 @@ class EspInfo:
         for this_efi in all_dual_mounts:
             if this_efi != current_efi and not self.is_efi_current_boot(this_efi):
                 pargs = rsync + [f'{current_efi}/', f'{this_efi}/']
-                cmd = ' '.join(pargs)
-                print(cmd)
+                if not self.quiet:
+                    cmd = ' '.join(pargs)
+                    print(cmd)
 
                 [retc, out, err] = run_prog(pargs)
                 if retc != 0:
@@ -352,12 +355,14 @@ def parse_args():
     bind = False
     sync = False
     test = False
+    quiet = False
     efi_mount = '/boot'
 
     par = argparse.ArgumentParser(description=desc)
     par.add_argument('-b', '--bind', action='store_true', help='Bind mount active esp to efi mount')
     par.add_argument('-s', '--sync', action='store_true', help='Sync active efi to alternate')
     par.add_argument('-t', '--test', action='store_true', help='Test mode')
+    par.add_argument('-q', '--quiet', action='store_true', help='Quiet mode')
     par.add_argument('efi_mount', nargs='?', default=efi_mount,
                      help=f'Where to bind mount active esp ({efi_mount})')
     parsed = par.parse_args()
@@ -368,6 +373,8 @@ def parse_args():
             sync = parsed.sync
         if parsed.test:
             test = parsed.test
+        if parsed.quiet:
+            quiet = parsed.quiet
 
         efi_mount = parsed.efi_mount
 
@@ -375,6 +382,7 @@ def parse_args():
             'bind'   : bind,
             'sync'   : sync,
             'test'   : test,
+            'quiet'  : quiet,
             'efi_mount' : efi_mount,
             }
 

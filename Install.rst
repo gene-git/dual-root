@@ -23,26 +23,34 @@ and a set of html pages under _build/html
 duel-root-tool 
 --------------
 
-On arch simpley build and install the package. The PKGBUILD is on AUR and under packaging directory.
+On arch simply build and install the package. The PKGBUILD is on AUR and under packaging directory.
 
-Otherwise install dual-root-tool
+Otherwise manually install dual-root-tool, run the installer script as root with the 
+destination directory set to */* ::
 
-    cp dual-root-tool /usr/bin/
+    ./scripts/do-install / 
 
-Bind mount service file ::
+This installs into ::
 
-    cp bind-mount-efi.service /etc/systemd/system/
-      or
-    cp bind-mount-efi.service /usr/lib/systemd/system
+    /etc/dual-root 
+    /usr/share/dual-root
+    /usr/share/licenses/dual-root/
+
+    /usr/bin/dual-root-tool
+    /usr/lib/systemd/system/bind-mount-efi.service
+
+/usr/bin/dual-root is now a symlink to */etc/dual-root/dual-root-tool*
+This allows us to organize the code a little better. 
+
+As usual to activate the bind service::
 
     systemctl enable bind-mount-efi.service
     systemctl start bind-mount-efi.service
 
-Remember to ensure that the <esp> get mounted before bind mount service add mount
-options x-systemd.before=bind-mount-efi.service to each of the <esp> mount lines::
+Remember to ensure that the <esp>s get mounted before bind mount service.
+That is done using systemd mount option in fstab.
+Add option *x-systemd.before=bind-mount-efi.service* to each of the <esp> mount lines::
 
     UUID=... /efi0 vfat rw,...,x-systemd.before=bind-mount-efi.service 0 0
     UUID=... /efi1 vfat rw,...,x-systemd.before=bind-mount-efi.service 0 0
-
- 
 

@@ -9,16 +9,35 @@
 #
 dest="$1"
 self="dual-root"
+dest=${dest%/}          # strip any trailing /
 
-info="README.rst Install.rst CHANGELOG.md scripts packaging bind-mount-efi.service dual-root-tool"
-infodir="/usr/share/${self}"
+#
+# info
+#
+info="README.rst Install.rst CHANGELOG.md scripts packaging"
+infodir="usr/share/${self}"
 
+#
+# license
+#
 license="LICENSE"
-licensedir="/usr/share/licenses/${self}"
+licensedir="usr/share/licenses/${self}"
 
-#units='dual-root-sync.service'
+#
+# systemd units
+#
+#units='dual-root-sync.service bind-mount-efi.service'
 units='bind-mount-efi.service'
-unitdir='/usr/lib/systemd/system/'
+unitdir='usr/lib/systemd/system/'
+
+#
+# etc
+#
+etc='etc/'
+etc='dual-root-tool'
+etcdir='etc/dual-root'
+
+# apps
 apps=('dual-root-tool')
 
 # so can make app link in /usr/bin
@@ -27,8 +46,11 @@ if [ ! -d "$dest" ] ; then
     echo 'Missing destination directory'
     exit 1
 else
+    # etc
+    /usr/bin/rsync --mkpath -a ${etc} ${dest}/${etcdir}/
+
     # shared
-    /usr/bin/rsync --mkpath -a ${info} ${dest}${infodir}
+    /usr/bin/rsync --mkpath -a ${info} ${dest}/${infodir}
     /usr/bin/rsync --mkpath -a ${license} ${dest}/${licensedir}/${license}
 
     # systemd units 
@@ -40,7 +62,7 @@ else
         /usr/bin/mkdir -p "${dest}/usr/bin"
         for app in ${apps[@]}
         do
-            /usr/bin/rsync ${app} ${dest}/usr/bin/${app}
+            ln -sf /${etcdir}/${app} ${dest}/usr/bin/${app}
         done
     fi
     exit 0

@@ -259,15 +259,14 @@ It identifies which <esp> was used to boot the system and can bind mount that <e
 
 We also provide a systemd service unit to make this all work smoothly [5]_.
 
-Whats needed is to::
+What needed is install the *dual-root-tool* script. The simplest way is run the installer
+with destination directory set to */* (or install the dual-root package)::
 
-    * install the script in */usr/bin/dual-root-tool*
-    * install  systemd service file in */etc/systemd/system/bind-mount-efi.service*   
-       or to /usr/lib/systemd/system if you prefer
+    * ./scripts/do-install /
 
-Now enable the service with the usual incantation::
+Also see Install.rst file for more info. Script installs the tool in */usr/bin/dual-root-tool*
+and the bind-mount-efi.service file into */usr/lib/systemd/system*.
 
-    systemctl enable bind-mount-efi.service
 
 Next add a mount option to both the efi0 and efi1 mount lines in */etc/fstab* 
 (NB or /mnt/root/etc/fstab if you have not booted machine yet). 
@@ -279,16 +278,14 @@ And the same for efi1 naturally::
 
 This will ensure both */efi0* and */efi1* are mounted before the *bind-mount-efi* service,
 which uses *dual-root-tool -b* to determine which 2 <esp> was used
-to boot the system. Armed with that information, then the active <esp> is then mounted on */boot*.
+to boot the system. Armed with that information, then the active <esp> will be mounted to */boot*.
 
-Now that we have */boot* holding the 'actively booted' <esp>. We have overcome 
-what we believe to be the trickiest part of making this work correctly.
 
 dual-root-tool
 --------------
 
 Couple of notes on the *dual-root-tool* itself
-.
+
 This version is written in python, as I found doing it in bash unpleasant and I think 
 far too complex for a bash script; though I am sure there are folks more skilled 
 than me that could make a bash version.  
@@ -315,6 +312,25 @@ You want to run this using test mode via *-t* to see what it would do. For examp
 Now is a good time to reboot - all should work and you should have /boot bind mounted
 from the actively booted <esp>.
 
+After booting both <esp>s are mounted : */efi0* and */efi1*.
+
+Now let's check that tool is working, run it with no arguments::
+
+   dual-root-tool
+
+All being well will print out the currently booted <esp>. And you can also check that
+it will bind mount /boot by running::
+
+   dual-root-tool -b
+
+You can also run it in test mode by adding *-t* option.
+Now that we have */boot* holding the 'actively booted' <esp>. We have overcome 
+what we believe to be the trickiest part of making this work correctly.
+
+Now enable the service with the usual incantation so that */boot* is mounted automatically::
+
+    systemctl start bind-mount-efi.service
+    systemctl enable bind-mount-efi.service
 
 Syncing ESPs
 -------------
@@ -328,20 +344,21 @@ then you can update the latter using::
 
     rsync -v -axHAX --exclude=/lost+found/ --delete /efi0/ /efi1/
 
-This can also done by using the sync option of the dual-root-tool::
+This can also done by using the sync option of the dual-root-tool.
+Lets run it in test mode where is simply shows what would be done::
 
-    dual-root-tool -s
+    dual-root-tool -st
 
-This can be run manually or by using a pacman hook (Arch Linux) triggered by
-changes to /boot.  Another way is to use inotify. This can be done by
-installing inotify-tools.
+When ready you can remove the *-t* flag.
 
-*Coming soon - inotify based systemd service*
+This can be run manually at anytime or by using a pacman hook (Arch Linux) triggered by
+changes to /boot.  It can be run periodically from cront. 
+The best way way is to use inotify. This can be done by installing inotify-tools.
 
-Copy the duel-root-sync.service file to /etc/systemd/systemd and enable and start as usual
-This monitors /boot for changes and calls *dual-root-tool -s* to sync active <esp> to the
-alternate <esp> whenever an event is detected.
+*Coming soon - inotify based service*
 
+This uses inotify to monitor */boot* for changes. Whenever a change event is detected, 
+it then calls *dual-root-tool -s* to sync the active <esp> to the alternate <esp>.
 
 Second Approach
 ===============
