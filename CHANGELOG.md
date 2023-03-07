@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.1] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-03-07
+ - Comment change in inotify code. Add couple lines on recovering from disk failure to docs  
+ - Add comment on recovering from disk failure  
+ - update CHANGELOG.md  
+
 ## [1.0.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-03-07
  - Release 1.0.0  
  - Inotify sync option (dual-root-tool -sd) available  
