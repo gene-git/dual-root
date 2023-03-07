@@ -294,7 +294,7 @@ I think it might be a good idea to have a version of dual-boot-tool
 written in C++ or C at some point. That said, As of now, the python works, 
 and besides, who doesn't have python installed these days!
 
-The *bind-mount-efi.service* uses */usr/bin/dual-root-tool* to do all the real work.
+The *bind-mount-efi.service* uses *dual-root-tool* to do all the real work.
 
 If *dual-root-tool* is run with no arguments, it prints information about the 
 currently booted <esp>. You should run this to confirm it does the right 
@@ -353,9 +353,28 @@ When ready you can remove the *-t* flag.
 
 This can be run manually at anytime or by using a pacman hook (Arch Linux) triggered by
 changes to /boot.  It can be run periodically from cront. 
-The best way way is to use inotify. This can be done by installing inotify-tools.
+The best way way is to use inotify - this requires inotify-tools be installed.
 
-*Coming soon - inotify based service*
+The to start the inotify based sync daemon simply run with *-sd * or *--syncd*::
+
+    dual-root-tool -sd
+
+This will monitor the currently booted <esp> mountm, and whenever it gets
+a change event notification from inotify, it wil syn to the alternate one(s).
+You can run it in test mode *-t* - in this case it will print what it would do
+but doesn't copy - same as when running *-s -t*.
+
+In non-test mode you can touch a file and watch it appear in the alternate.
+The service unit file runs it in quiet mode (*-q -sd*).
+
+To use the systemd service unit is installed when using the scripts/do-install program
+into the usual */usr/lib/systemtd/system/dual-root-syncd.service*
+
+And start as usual::
+
+    systemctl enable dual-root-syncd.service
+    systemctl start dual-root-syncd.service
+
 
 This uses inotify to monitor */boot* for changes. Whenever a change event is detected, 
 it then calls *dual-root-tool -s* to sync the active <esp> to the alternate <esp>.

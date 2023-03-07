@@ -31,6 +31,7 @@ def parse_args():
 
     bind = False
     sync = False
+    syncd = False
     test = False
     quiet = False
     efi_mount = '/boot'
@@ -38,6 +39,7 @@ def parse_args():
     par = argparse.ArgumentParser(description=desc)
     par.add_argument('-b', '--bind', action='store_true', help='Bind mount active esp to efi mount')
     par.add_argument('-s', '--sync', action='store_true', help='Sync active efi to alternate')
+    par.add_argument('-sd','--syncd', action='store_true', help='Start sync daemon using inotify')
     par.add_argument('-t', '--test', action='store_true', help='Test mode')
     par.add_argument('-q', '--quiet', action='store_true', help='Quiet mode')
     par.add_argument('efi_mount', nargs='?', default=efi_mount,
@@ -48,6 +50,9 @@ def parse_args():
             bind = parsed.bind
         if parsed.sync:
             sync = parsed.sync
+        if parsed.syncd:
+            syncd = parsed.syncd
+            sync = True
         if parsed.test:
             test = parsed.test
         if parsed.quiet:
@@ -58,14 +63,13 @@ def parse_args():
     conf = {
             'bind'   : bind,
             'sync'   : sync,
+            'syncd'  : syncd,
             'test'   : test,
             'quiet'  : quiet,
             'efi_mount' : efi_mount,
             }
-
     return conf
 
-#import pdb
 def main():
     """
     Tool to :
@@ -79,7 +83,6 @@ def main():
          -h           : help
          efi_mount     : where to mount the active esp - default is /boot
     """
-    #pdb.set_trace()
     conf = parse_args()
 
     esp = EspInfo(conf)
@@ -87,8 +90,13 @@ def main():
 
     if conf["bind"]:
         esp.bind_mount_efi()
+
     if conf["sync"]:
-        esp.sync_alt_efi()
+        if conf["syncd"]:
+            esp.sync_daemon_alt_efi()
+        else:
+            esp.sync_alt_efi()
+
 
 if __name__ == '__main__':
     main()

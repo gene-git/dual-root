@@ -27,6 +27,7 @@ from .utils_block import partuuid_to_device
 from .utils_block import mount_to_uuid
 from .utils_block import bind_mount
 from .sync import sync_esp_to_alternates
+from .inotify import popen_inotify_daemon
 
 class Esp:
     """
@@ -201,3 +202,12 @@ class EspInfo:
             return
 
         sync_esp_to_alternates(current_efi, alt_dual_mounts, self.quiet, self.test)
+
+    def sync_daemon_alt_efi(self):
+        """
+        Sunc Daemon:
+         - Use inotify to monitor current efi and sync
+           alternates whenver change detected
+        """
+        current_efi = self.esp.mount
+        popen_inotify_daemon(self, current_efi)

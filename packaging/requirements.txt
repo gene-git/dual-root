@@ -2,3 +2,4 @@ python
 efibootmgr
 util-linux
 rsync
+inotify-tools

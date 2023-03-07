@@ -26,8 +26,7 @@ licensedir="usr/share/licenses/${self}"
 #
 # systemd units
 #
-#units='dual-root-sync.service bind-mount-efi.service'
-units='bind-mount-efi.service'
+units='bind-mount-efi.service dual-root-syncd.service'
 unitdir='usr/lib/systemd/system/'
 
 #

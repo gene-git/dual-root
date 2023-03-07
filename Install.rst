@@ -19,6 +19,7 @@ To build pdf or html version of the readme::
 
 This will create _build/latex/dual-root.pdf
 and a set of html pages under _build/html
+sphinx (aka python-sphinx) must be installed
 
 duel-root-tool 
 --------------
@@ -38,6 +39,7 @@ This installs into ::
 
     /usr/bin/dual-root-tool
     /usr/lib/systemd/system/bind-mount-efi.service
+    /usr/lib/systemd/system/dual-root-syncd.service
 
 /usr/bin/dual-root is now a symlink to */etc/dual-root/dual-root-tool*
 This allows us to organize the code a little better. 
@@ -46,6 +48,12 @@ As usual to activate the bind service::
 
     systemctl enable bind-mount-efi.service
     systemctl start bind-mount-efi.service
+
+And for the inotify based sync daemon::
+
+    systemctl enable bind-mount-efi.service
+    systemctl start bind-mount-efi.service
+
 
 Remember to ensure that the <esp>s get mounted before bind mount service.
 That is done using systemd mount option in fstab.
