@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-03-07
+ - Release 1.0.0  
+ - Inotify sync option (dual-root-tool -sd) available  
+   dual-root-syncd.service to start the sync daemon  
+ - update CHANGELOG.md  
+
 ## [0.9.1] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-03-07
  - update to 0.9.1  
  - Refactor and tidy up code  
