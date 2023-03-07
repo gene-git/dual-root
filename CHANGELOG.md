@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.2] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-03-07
+ - Forgot to add dual-root-syncd.service file - added  
+ - Remove inotify todo item - its done :)  
+ - update CHANGELOG.md  
+
 ## [1.0.1] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-03-07
  - Comment change in inotify code. Add couple lines on recovering from disk failure to docs  
  - Add comment on recovering from disk failure  
