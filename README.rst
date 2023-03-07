@@ -379,6 +379,15 @@ And start as usual::
 This uses inotify to monitor */boot* for changes. Whenever a change event is detected, 
 it then calls *dual-root-tool -s* to sync the active <esp> to the alternate <esp>.
 
+How to Recover if 1 Disk Dies
+-----------------------------
+
+First thing is machine will boot of the good disk - raid will be degraded but keep running.
+Replace the disk - add partitions to new disk - *bootctl install* onto the new disk's <esp>.
+And add the other partition back into the raid. Sync daemon will update the new <esp>.
+
+Thats it - back in business!!
+
 Second Approach
 ===============
 
