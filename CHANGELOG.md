@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.9.1] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-03-07
+ - update to 0.9.1  
+ - Refactor and tidy up code  
+ - update CHANGELOG.md  
+
 ## [0.9.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-03-07
  - Add -q quiet option to dual-root-tool  
    update Install.rst instructions  
