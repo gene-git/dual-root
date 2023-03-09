@@ -9,8 +9,9 @@ from .utils_block import mount_to_uuid
 
 def sync_one(sync_item, quiet, test):
     """
-    Sync one item defined in SyncItem input
-    source/dest/exclusionsitems use rsync notation (e.g. include trailing "/" if needed etc
+    Sync one SyncItem 
+     - source/dest/exclusionsitems use rsync notation 
+     - e.g. include trailing "/" if needed etc
     """
     rsync_opts = []
     if test:

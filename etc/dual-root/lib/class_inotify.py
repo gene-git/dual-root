@@ -15,7 +15,7 @@ class WatchItem:
     def __init__(self, sync_item):
         """
         One inotify item
-         - action will be called : action(watch_dir, dest_dir_list)
+         - On event the action taken is calling: self.sync_item.sync()
         """
         self.sync_item = sync_item
         self.pipe = None
@@ -56,13 +56,12 @@ def inotify_signal_handler(_sig_num, _sig_frame):
 class Inotify:
     """
     Handle Multiple Inotify Change Events
-    To register watchdir called provides watch elem:
-     - watchdir, destdir_list, action_function
-       action_function(watch_dir, destdir_list)
+     - Call add_watch_item() for each being watched
+     - popen_inotify() to open one pipe to each monitor
+     - event_handler()
     """
     def __init__(self):
         """
-        Handle list of items
         Add all the watch points then init()
          - Map each items pipe.stdout -> item, when selec() can recover item.
         """
@@ -85,7 +84,7 @@ class Inotify:
 
     def terminate(self):
         """
-        Make sure all the inotify processes are properl terminated
+        Be sure all inotify processes are properly terminated
         """
         for item in self.watch_list:
             item.terminate()

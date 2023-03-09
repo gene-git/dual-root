@@ -10,8 +10,9 @@ from .class_inotify import Inotify
 
 class SyncItem:
     """
-    One logical sync - source, destination, options
-    options are common 
+    One item to be watched and synced
+     - Holds: source, destination_list, exclusion list 
+     - standard rsync options are common and not per item
     """
     # pylint: disable=R0903
     def __init__(self, src, dst_list, excl_list, quiet, test):

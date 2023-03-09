@@ -82,12 +82,10 @@ def main():
         - identify currently booted <esp>
         - bind mount currently booted <esp> onto /boot
         - sync currently booted <esp> on to the other <esp>
-    Arhg :
+    Args :
+         -h for help:
          no arguments : print out information about currenntly booted efi
-         -b           : bind mount currently booted <esp> onto "mount" - default is /boot
-         -s           : sync currentnly booted <esp> to the other on
-         -h           : help
-         efi_mount     : where to mount the active esp - default is /boot
+         --bind, --sync, --syncd, --test, --quiet. --conf CONF 
     """
     conf = parse_args()
 

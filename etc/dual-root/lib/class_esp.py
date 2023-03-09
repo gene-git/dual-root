@@ -176,7 +176,7 @@ class EspInfo:
             if self.euid == 0 and not self.test:
                 bind_mount(self.esp.mount, self.efi_mount)
             else:
-                print('Must be root to use bind mount')
+                print('Must be non-test mode and root to use bind mount')
 
     def dual_root_mounts(self):
         """
@@ -233,8 +233,8 @@ class EspInfo:
         for dest in self.dual_root_alt_mount_list:
             dest_list.append(f'{dest}/')
 
-        exceptions = []
-        sync_item = [f'{current_efi}/', dest_list, exceptions]
+        exclusions = []
+        sync_item = [f'{current_efi}/', dest_list, exclusions]
         self.sync_list.append(sync_item)
 
     def sync_all_items(self):

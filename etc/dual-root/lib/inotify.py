@@ -11,9 +11,8 @@ from select import select
 
 def terminate_one_inotify(pipe, pid):
     """
-    Be nice if we exit and shutdown inotify
-    If we got here pipe.terminate() may 
-    not longer be useful
+    When exiting, do what we can to shutdown all inotify processes.
+    Possible pipe.terminate() may or may not be viable.
     """
     if pipe and pipe.poll() is None:
         try:
@@ -71,9 +70,10 @@ def popen_one_inotify(watchdir):
 
 def inotify_event_handler(inotify):
     """
-    Monitors all the inotify pipes and handles events on any of them.
-     - on each event notify, run event_action for that item
-     - each pipe.stdout is mapped back to watch item
+    Monitors all inotify pipes and handles events on any of them.
+     - on each event notify, run the correponding item's sync() function
+     - Use pipe.stdout map to find associated sync_item from the file IO
+       returned by select()
     """
     watch_list = inotify.watch_list
     num_items = len(watch_list)
