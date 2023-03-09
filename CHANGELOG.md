@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.0.2] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-03-09
+ - Doc wordsmithing  
+ - Wordsmithing README  
+ - update CHANGELOG.md  
+
 ## [2.0.1] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-03-09
  - Tidy some coding comments  
  - update CHANGELOG.md  
