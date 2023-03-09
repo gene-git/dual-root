@@ -1,5 +1,16 @@
 # Changelog
 
+## [2.0.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-03-09
+ - Tweak systemd service descriptions  
+   update README with new syncd info  
+   Re-write sync code  
+   New Sync and Inotify classes  
+   New optional sync-daemon.conf allows specifying what to sync with list of :  
+   [source, destination(s), exclusion(s)]  - each in rsync compatible form  
+   Can be used with Approach 2  
+   Remove timeout=0 from select()  
+ - update CHANGELOG.md  
+
 ## [1.0.2] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-03-07
  - Forgot to add dual-root-syncd.service file - added  
  - Remove inotify todo item - its done :)  
