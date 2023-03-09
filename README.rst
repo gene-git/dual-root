@@ -13,8 +13,10 @@ NEW
 March 9 2023:
 
  * Sync option and sync daemon now support a config file with 
-   - list of items in rsync format (source_directory, target_directorr(s), exceptions) 
-   - useful for the Second Approach or to have an additional directory kept in sync
+
+   * list of items in rsync format (source_directory, target_directorr(s), exclusions) 
+   * useful for the Second Approach or to have an additional directory kept in sync
+
  * refactored and added new sync and inotify classes.
 
 Goal
@@ -50,12 +52,13 @@ operating system.
 
 The 2 approaches outlined here both use:
 
- - 2 disks
- - each disk has its own <esp> partition. 
- - <esp>s are kept in sync with each other.
- - no constraints on disk other than they each have sufficient capacity.
- - using systemd boot 
-   - Im sure refind or grub would work too. I use systemd boot.
+ * 2 disks
+ * each disk has its own <esp> partition. 
+ * <esp>s are kept in sync with each other.
+ * no constraints on disk other than they each have sufficient capacity.
+ * using systemd boot 
+
+   * Assume refind or grub would work too. 
 
  We provide *dual-boot-tool* and systemd services to make it as straightforwards as possible to
  implement. The tool can identify the currently booted <esp>, bind mount it to */boot* and
@@ -63,20 +66,28 @@ The 2 approaches outlined here both use:
  changes in the filessystem.
 
 First Approach:  [1]_
- - Best Approach [2]_
- - Best suited for fresh installs
-   - new install takes more time
-   - Use backup of existing root drive to keep downtime to minimum.
- - sync list:
-   - <esp>s
- - kernel and initrd on <esp>
- - Both <esp>s use same loader configs
- - Everything else is mirrored using btrfs raid1
- - With SSD, best not to mix SSD and spinner for RAID (lose speed benefit)
- - included systemd service 
-   - mounts currently booted <esp> onto /boot
- - included systemd service 
-   - identifies booted <esp> and sync's other <esp>s from current <esp>
+ * Best Approach [2]_
+ * Best suited :
+
+   * fresh installs
+   * new install takes longer
+   * use backup of existing root drive to minimize downtime
+
+ * sync list:
+
+   * <esp>s
+
+ * kernel and initrd on <esp>
+ * Both <esp>s use same loader configs
+ * Everything else is mirrored using btrfs raid1
+ * With SSD, best not to mix SSD and spinner for RAID (lose speed benefit)
+ * included systemd service 
+
+   * mounts currently booted <esp> onto /boot
+
+ * included systemd service 
+
+   * identifies booted <esp> and sync's other <esp>s from current <esp>
 
 For those who prefer to keep their kernels on a linux filesystem,
 it is easy enough to use a separate /boot partition of type XBOODLDR.
@@ -91,16 +102,20 @@ to leave them all on the <esp>
 
 
 Second Approach:
- - best suited :
-   - upgrade existing system with minimal changes
-   - using 1 SSD + 1 spinner, and want to keep primary boot on SSD
- - sync list:  
-   - <esp>, boot, root, usr and possibly var
-   - dynamic areas (e.g. var) should preferably be on a RAID array.
+ * best suited :
+   
+   * upgrade existing system with minimal changes
+   * using 1 SSD + 1 spinner, and want to keep primary boot on SSD
+
+ * sync list:  
+
+   * <esp>, boot, root, usr and possibly var
+   * dynamic areas (e.g. var) should preferably be on a RAID array.
      Especially if there are things like mail or databses running.
      What I do is keep these on separate RAID-6 and bind mount them into var
- - Short Downtime only to install 2nd disk.  Configure while running normally.
- - Each disk has its own /boot, and thus different UUID and thus different
+
+ * Short Downtime only to install 2nd disk.  Configure while running normally.
+ * Each disk has its own /boot, and thus different UUID and thus different
    boot loader config UUIDs - so these need to be excluded from sync.
 
 
@@ -674,7 +689,7 @@ For this use case you can turn off the autosync which handles the first approach
 Copy the sample config */etc/dual-root/sync-daemon.conf*. It has comments.
 Turn off the code that handles approach 1 by setting *dualroot = false* then make a list
 of items to sync. Each item will be used with rsync, and are therefore in rsync format
-(careful with trailing slashes!). Each item has [source_dir, dest_dir(s), exceptions].
+(careful with trailing slashes!). Each item has [source_dir, dest_dir(s), exclusions].
 
 
 To confirm it will do what you want run it in test mode ::
@@ -686,7 +701,7 @@ It will print what will happen. Once you're happy,m then enable and start the da
     systemctl enable  dual-root-syncd
     systemctl start  dual-root-syncd
 
-This is examnple config ::
+This is examnple sync daemon config ::
 
     dualroot = false
     sync = [
@@ -702,8 +717,7 @@ This is examnple config ::
         ["/opt", "/mnt/root1/" ],
         ]
 
-Note the example has exceptions to exclude */etc/fstab* and */boot/loader*
-
+Note the example has exclusions to exclude */etc/fstab* and */boot/loader*
 
 Epilogue
 ========
