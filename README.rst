@@ -51,55 +51,64 @@ operating system.
 The 2 approaches outlined here both use:
 
  - 2 disks
- - each disk has an <esp> partition. <esp>s are automatically kept in sync with each other.
- - there are no constraints on each disk other than they each have sufficient capacity.
+ - each disk has its own <esp> partition. 
+ - <esp>s are kept in sync with each other.
+ - no constraints on disk other than they each have sufficient capacity.
+ - using systemd boot 
+   - Im sure refind or grub would work too. I use systemd boot.
+
+ We provide *dual-boot-tool* and systemd services to make it as straightforwards as possible to
+ implement. The tool can identify the currently booted <esp>, bind mount it to */boot* and
+ perform various sync operations either one off or as a daemon using inotify to detect
+ changes in the filessystem.
 
 First Approach:  [1]_
  - Best Approach [2]_
  - Best suited for fresh installs
- - sync <esp>
- - keep kernel and initrd on <esp>
+   - new install takes more time
+   - Use backup of existing root drive to keep downtime to minimum.
+ - sync list:
+   - <esp>s
+ - kernel and initrd on <esp>
+ - Both <esp>s use same loader configs
  - Everything else is mirrored using btrfs raid1
- - Only <esp> to sync and rest being mirrored
- - Downtime long if upgrading existing system
- - Starting point is fresh install using 2 disks. 
- - If existing root drive is the 3rd drive, downtime here is also kept to minimum.
- - If using SSD, then its best if both drives are SSDs for raid
- - Which ever disk's <esp> is used to boot, share same loader configs
- - best when disks been combined with btrfs raid are simiar.
-   2 nvme is good, but I'd avoid raiding a fast nvme ssd with a slow spinner.
- - sync daemon : yes - keeps alternatea <esp> in sync with booted <esp>
+ - With SSD, best not to mix SSD and spinner for RAID (lose speed benefit)
+ - included systemd service 
+   - mounts currently booted <esp> onto /boot
+ - included systemd service 
+   - identifies booted <esp> and sync's other <esp>s from current <esp>
 
 For those who prefer to keep their kernels on a linux filesystem,
 it is easy enough to use a separate /boot partition of type XBOODLDR.
-These would need to be synced in addition to the <esp>. 
+These would need to be added to sync config to be included.
 
+Aside:
 I have not tested this, but it may be possible to bind the 2 boot partitions with
 a btrfs raid1. In the usual case, the loader finds the XBOOTLDR partition
-on the same disk as the esp. With raid spanning the 2 disks, each of
-type XBOOTLDR it may or may not work. 
+by looking on the same disk as the esp. With raid spanning the 2 disks, each of
+type XBOOTLDR it may or may not work - so untested. It is certainly simpler
+to leave them all on the <esp>
 
 
 Second Approach:
- - best suited to upgrade existing system with minimal changes
- - syncing <esp>, boot, root, usr and possibly var
- - dynamic areas (e.g. var) should preferably be on a RAID array.
-   Especially if there are things like mail or databses running.
-   What I do is keep these on separate RAID-6 and bind mount them into var
- - All thats needed is second with adequate disk space
- - Downtime is only the few minutes to install 2nd disk.  Configuration while up and running normally.
- - Starting point is a working linux computer using systemd-boot. 
- - If using SSD, then best if the primary boot drive uses SSD
- - Each boot now has its own /boot, and thus different boot loader config UUIDs
- - sync daemon : *coming soon*
-   Allow pairs of (source_directory, target_directory) to be kept in synced 
+ - best suited :
+   - upgrade existing system with minimal changes
+   - using 1 SSD + 1 spinner, and want to keep primary boot on SSD
+ - sync list:  
+   - <esp>, boot, root, usr and possibly var
+   - dynamic areas (e.g. var) should preferably be on a RAID array.
+     Especially if there are things like mail or databses running.
+     What I do is keep these on separate RAID-6 and bind mount them into var
+ - Short Downtime only to install 2nd disk.  Configure while running normally.
+ - Each disk has its own /boot, and thus different UUID and thus different
+   boot loader config UUIDs - so these need to be excluded from sync.
 
 
 We use Archlinux but the distro shouldn't play any significant role in dual root setup. 
 We find the Arch rolling release distro convenient and robust.
 
 One of the beautiful things about linux is that, more often than not, there is more than
-one way to do things.  And here is one way :)
+one way to do things.  And here are two ways :)
 
 First Approach
 ================
