@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.0.1] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-03-09
+ - Tidy some coding comments  
+ - update CHANGELOG.md  
+
 ## [2.0.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-03-09
  - Tweak systemd service descriptions  
    update README with new syncd info  
