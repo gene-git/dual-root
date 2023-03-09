@@ -1,0 +1,51 @@
+#
+# Sync Daemon Config
+# /etc/dual-root/sync-daemon.conf
+# ---------------------------------
+# TOML File Format:
+# 
+# Optional file, can be empty.
+# * Source and destinations are passed to rsync and thus follow rsync conventions 
+#
+# Format is Key = Value. There are 2 keys :
+#  * dualroot = true/false
+#  * sync = a list of one or more [source/dest/exclusions[
+# dest may optionally be a list - exclusions must be a list
+#
+# Approach 1:
+# ----------
+#  Dont need this file at all unless there are additional things to sync other than /efi<n>
+#
+#  Using /efi0, /efi1, ... these are auto detected: 
+#  Leave dualroot commented out (or set to true)
+#  only add any additional directories to sync. Typically nothing.
+#
+# Approach 2:
+# ----------
+#  Does not use /ef0, /efi1, ... 
+#  Set dualroot = false
+#  Add specific direcrories to sync. You will need exclusions here typically 
+#  for /etc/fstab and loader entries.
+#
+# -----------
+#  Examples
+# 
+#  ["src", "dest" , [exclude1, exclude 2, ...]]
+#
+# Example 1 : Approach Two 
+# -------------------------
+#   dualroot = false
+#            Source       Dest               Exclusions
+#   sync = [
+#           ["/efi/EFI",  "/mnt/root1/efi/"],
+#           ["/boot",     "/mnt/root1/",     ["/boot/loader]],
+#           ["/etc",      "/mnt/root1/",     ["/etc/fstab"],
+#          ]
+#
+# Example 2 : Approach One 
+# -------------------------
+# Usually not needed
+# This (silly) example just keeps backup copy of /home synced to a backup dir (told you was silly)
+#
+#    sync = ["/home", "/mnt/backups"]
+#

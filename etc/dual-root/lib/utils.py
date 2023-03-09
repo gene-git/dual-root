@@ -19,6 +19,17 @@ def os_scandir(tdir):
             scan = None
     return scan
 
+def open_file(path, mode):
+    """
+    Open a file and return file object
+    """
+    # pylint: disable=W1514,R1732
+    try:
+        fobj = open(path, mode)
+    except OSError as err:
+        print(f'Error opening file {path} : {err}')
+        fobj = None
+    return fobj
 
 def run_prog(pargs,input_str=None,stdout=subprocess.PIPE,stderr=subprocess.PIPE):
     """

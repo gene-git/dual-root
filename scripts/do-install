@@ -32,6 +32,7 @@ unitdir='usr/lib/systemd/system/'
 #
 # etc
 #
+conf='etc/sync-daemon.conf.sample'
 etc1='etc/dual-root/*py'
 etc2='etc/dual-root/lib/*py'
 #etc='dual-root-tool'
@@ -49,10 +50,12 @@ else
     # etc
     /usr/bin/rsync --mkpath -a ${etc1} ${dest}/${etcdir}/
     /usr/bin/rsync --mkpath -a ${etc2} ${dest}/${etcdir}/lib/
+    /usr/bin/rsync --mkpath -a ${conf} ${dest}/${etcdir}/
 
     # shared
     /usr/bin/rsync --mkpath -a ${info} ${dest}/${infodir}
     /usr/bin/rsync --mkpath -a ${license} ${dest}/${licensedir}/${license}
+    /usr/bin/rsync --mkpath -a ${conf} ${dest}/${infodir}/
 
     # systemd units 
     /usr/bin/mkdir -p ${dest}/${unitdir}

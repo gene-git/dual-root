@@ -26,8 +26,8 @@ from .utils_block import booted_esp_partuuid
 from .utils_block import partuuid_to_device
 from .utils_block import mount_to_uuid
 from .utils_block import bind_mount
-from .sync import sync_esp_to_alternates
-from .inotify import popen_inotify_daemon
+from .config import read_config
+from .class_sync import Sync
 
 class Esp:
     """
@@ -47,8 +47,8 @@ class Esp:
     def uuid_and_mounts(self):
         """
         For currently booted esp:
-         - Get partuuid 
-         - Get uuid 
+         - Get partuuid
+         - Get uuid
         Use efibootmgr to identify booted esp
         """
         # pylint disable=R0912
@@ -86,8 +86,10 @@ class EspInfo:
         # esp is the currently booted esp.
         # Alternate esp's are listed in esp_alt
         #
+        self.okay = True
         self.test = conf['test']
         self.quiet = conf['quiet']
+        self.config_file = conf['config_file']
         self.esp = Esp()
         self.esp_alt = []
 
@@ -100,9 +102,30 @@ class EspInfo:
         self.dual_root_alt_mount_list = []      # alternate /efi<n>
         self.is_dual_root = False
 
+
+        #
+        # Load any sync daemon config
+        #
+        (sync_dual_root, sync_list) = read_config(self.config_file)
+        self.sync_dual_root = sync_dual_root
+        self.sync_list = sync_list
+
         self.efi_mount_uuid = mount_to_uuid(self.efi_mount)
         self.is_efi_mounted()
         self.dual_root_mounts()
+
+        #
+        # if dual root syncing on add to the sync list
+        #
+        self.add_dual_root_sync()
+
+        #
+        # Install and check sync list
+        #
+        self.sync = Sync(self.sync_list, self.quiet, self.test)
+        okay = self.sync.check()
+        if not okay:
+            self.okay = False
 
     def is_path_current_booted_esp(self, efi):
         """
@@ -177,13 +200,15 @@ class EspInfo:
         if len(self.dual_root_mount_list) > 1:
             self.is_dual_root = True
 
+    def add_dual_root_sync(self):
+        """
+        If syn'cing dual root add to the sync list
+          - source is currently booted efi mount
+          - dest is list of alternates
+        """
+        if not self.sync_dual_root:
+            return
 
-    def sync_alt_efi(self):
-        """
-        Sync the current booted esp to other esps
-        If /efi0 is current then sync
-          - /efi0/* -> /efiN for N != 0
-        """
         current_efi = self.esp.mount
         all_dual_mounts = self.dual_root_mount_list
         alt_dual_mounts = self.dual_root_alt_mount_list
@@ -201,13 +226,27 @@ class EspInfo:
             print('No alternate dual root esp found -  nothing to sync')
             return
 
-        sync_esp_to_alternates(current_efi, alt_dual_mounts, self.quiet, self.test)
+        #
+        # Add trailing "/" - want to rsync /efi0/ /efi1
+        #
+        dest_list = []
+        for dest in self.dual_root_alt_mount_list:
+            dest_list.append(f'{dest}/')
 
-    def sync_daemon_alt_efi(self):
+        exceptions = []
+        sync_item = [f'{current_efi}/', dest_list, exceptions]
+        self.sync_list.append(sync_item)
+
+    def sync_all_items(self):
+        """
+        One shot sync - no daemon
+        """
+        self.sync.sync_all_items()
+
+    def sync_daemon_start(self):
         """
         Sunc Daemon:
          - Use inotify to monitor current efi and sync
            alternates whenver change detected
         """
-        current_efi = self.esp.mount
-        popen_inotify_daemon(self, current_efi)
+        self.sync.init_daemon()

@@ -3,3 +3,4 @@ efibootmgr
 util-linux
 rsync
 inotify-tools
+tomli

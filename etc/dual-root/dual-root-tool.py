@@ -34,6 +34,7 @@ def parse_args():
     syncd = False
     test = False
     quiet = False
+    config_file = '/etc/dual-root/sync-daemon.conf'
     efi_mount = '/boot'
 
     par = argparse.ArgumentParser(description=desc)
@@ -42,6 +43,8 @@ def parse_args():
     par.add_argument('-sd','--syncd', action='store_true', help='Start sync daemon using inotify')
     par.add_argument('-t', '--test', action='store_true', help='Test mode')
     par.add_argument('-q', '--quiet', action='store_true', help='Quiet mode')
+    par.add_argument('-c', '--conf', default=config_file,
+                     help='Sync daemon config ')
     par.add_argument('efi_mount', nargs='?', default=efi_mount,
                      help=f'Where to bind mount active esp ({efi_mount})')
     parsed = par.parse_args()
@@ -57,6 +60,8 @@ def parse_args():
             test = parsed.test
         if parsed.quiet:
             quiet = parsed.quiet
+        if parsed.conf:
+            config_file = parsed.conf
 
         efi_mount = parsed.efi_mount
 
@@ -66,6 +71,7 @@ def parse_args():
             'syncd'  : syncd,
             'test'   : test,
             'quiet'  : quiet,
+            'config_file'  : config_file,
             'efi_mount' : efi_mount,
             }
     return conf
@@ -88,14 +94,17 @@ def main():
     esp = EspInfo(conf)
     esp.print_info()
 
+    if not esp.okay:
+        return
+
     if conf["bind"]:
         esp.bind_mount_efi()
 
     if conf["sync"]:
         if conf["syncd"]:
-            esp.sync_daemon_alt_efi()
+            esp.sync_daemon_start()
         else:
-            esp.sync_alt_efi()
+            esp.sync_all_items()
 
 
 if __name__ == '__main__':

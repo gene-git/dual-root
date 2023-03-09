@@ -4,8 +4,18 @@
 Dual Root Capable Linux System
 ==============================
 
-AKA hot spare alternate root disk
+AKA hot spare bootable root disk
 ---------------------------------
+
+NEW
+-----------
+
+March 9 2023:
+
+ * Sync option and sync daemon now support a config file with 
+   - list of items in rsync format (source_directory, target_directorr(s), exceptions) 
+   - useful for the Second Approach or to have an additional directory kept in sync
+ * refactored and added new sync and inotify classes.
 
 Goal
 ----
@@ -21,6 +31,8 @@ is having two drives with each drive having its own *<esp>*.
 We outline two approaches here, the first, and preferable, choice works well when doing
 a fresh install and the second approach works when adding to an existing system
 where the goal is to keep machine running and not start over with new install.
+Second approach may also be chosen if using 1 nvme and 1 spinner for the 2 disks.
+Using raid in this case will likely lose much of the nvme speed advantage.
 
 There are other possibilities but some may be risky and hacky in nature. We advocate
 systems that are robust, clean and transparent.
@@ -39,7 +51,7 @@ operating system.
 The 2 approaches outlined here both use:
 
  - 2 disks
- - each disk has an <esp> partition kept in sync
+ - each disk has an <esp> partition. <esp>s are automatically kept in sync with each other.
  - there are no constraints on each disk other than they each have sufficient capacity.
 
 First Approach:  [1]_
@@ -56,7 +68,7 @@ First Approach:  [1]_
  - Which ever disk's <esp> is used to boot, share same loader configs
  - best when disks been combined with btrfs raid are simiar.
    2 nvme is good, but I'd avoid raiding a fast nvme ssd with a slow spinner.
-
+ - sync daemon : yes - keeps alternatea <esp> in sync with booted <esp>
 
 For those who prefer to keep their kernels on a linux filesystem,
 it is easy enough to use a separate /boot partition of type XBOODLDR.
@@ -79,6 +91,8 @@ Second Approach:
  - Starting point is a working linux computer using systemd-boot. 
  - If using SSD, then best if the primary boot drive uses SSD
  - Each boot now has its own /boot, and thus different boot loader config UUIDs
+ - sync daemon : *coming soon*
+   Allow pairs of (source_directory, target_directory) to be kept in synced 
 
 
 We use Archlinux but the distro shouldn't play any significant role in dual root setup. 
@@ -91,7 +105,9 @@ First Approach
 ================
 
 Each of the two disks to be used needs its own <esp> and root partitions.
-The <esp> will eventually be mounted as /boot in linux.
+The currently booted <esp> will be mounted as /boot. Actually the <esp>'s are
+all mounted as /efi0, /efi1, etc. And whichever is currently booted is
+then bind mounted to /boot.
 
 Make the <esp> partitions each the same size - 1 - 2 GB provides plenty of room for multiple kernels.
 While btrfs raid mirror doesn't require equal sized partitions, if the disks are different sizes, 
@@ -104,7 +120,7 @@ If converting an existing setup, then backup everything either to another disk, 
 or internal or over the network to another computer. Otherwise we assume starting with
 fresh install.
 
-This methos has a tricky part to sort out, which is that we have one root but 2 esp partitions.
+This has one tricky part to sort out, which is that we have one root but 2 esp partitions.
 After the machine boots we will mount both <esp> partitions, 
 and we need to know which one was used to boot so that we can sync it to the other one.
 We'll explain how to do that in a robust way a little later.
@@ -612,6 +628,7 @@ Its also a good idea to check the boot order saved in the efi variables::
 
 You should now see both Linux entries listed.
 
+
 Testing and Tidying Up
 ======================
 
@@ -642,59 +659,41 @@ the *default* line, will need it's filename changed to match.
 Keeping Disks In Sync
 ---------------------
 
-Finally, we need to keep the disks in sync.  The simplest way to do this is run a little script
-which rsync's from current booted linux to the alternate mounted under /mnt/root1 and
-of course make sure NOT to replace fstab or the sd-boot loader entries.  Just run script out of cron.
-or manually when so inclined. You can also add a pacman hook (on arch anyway) to trigger an update of
-the alternate <esp> whenever systemd is updated. Or simply run it in the sync script.
-    
-Make sure the sync script is available on both disks!
+Finally, we need to keep the disks in sync.  The simplest way to do this is use the dual-root-tool
 
-This is a sample sync script:
-
-.. code:: bash
-
-    #!/bin/bash
-    #
-    # Copy files from currently booted system
-    # into alternate mounted on /mnt/root1
-    #  
-    # NB
-    # - do NOT copy fsteb or any loader entries.
-    #   - Surefire way to break boot.
-    # - Skip package cache 
-    # 
-    # To Add:
-    #   ** check /mnt/root1 is properly mounted before rsync
-    #
-    alt="/mnt/root1"
-
-    opt="-axHAX --info=stats --exclude=/lost+found/ --delete"
-    echo "Syn alternate root:"
-
-    echo "  /efi/EFI"
-      rsync $opt /efi/EFI $alt/efi/
-    echo "  /boot"
-      rsync $opt --exclude=/boot/loader/ /boot $alt/
-    echo "  /bin /lib /lib64 /usr"
-      rsync $opt /bin /lib /lib64 /usr $alt/
-    echo "  /root"
-      rsync $opt /root $alt/
-    echo "  /var"
-      rsync $opt --exclude=/var/cache/pacman/pkg/ /var $alt/
-    echo "  /etc"
-      rsync $opt --exclude=/etc/fstab /etc $alt/
-    echo "  /data"
-      rsync $opt /data $alt/
-    echo "  /srv"
-      rsync $opt /srv $alt/
+For this use case you can turn off the autosync which handles the first approach (using /efi0 /efi1 etc).
+Copy the sample config */etc/dual-root/sync-daemon.conf*. It has comments.
+Turn off the code that handles approach 1 by setting *dualroot = false* then make a list
+of items to sync. Each item will be used with rsync, and are therefore in rsync format
+(careful with trailing slashes!). Each item has [source_dir, dest_dir(s), exceptions].
 
 
-One simple approach to keeping it in sync is just to run this from cron - twice a day or perhaps more often.
-This is an example */etc/cron.d/syn-alternate* if the sync script is in */mnt* and */mnt/root1/mnt*::
+To confirm it will do what you want run it in test mode ::
 
-    # sync alternate root
-    05 2,14 * * * root /mnt/sync-root
+    dual-root-tool -sd -t
+
+It will print what will happen. Once you're happy,m then enable and start the daemon::
+
+    systemctl enable  dual-root-syncd
+    systemctl start  dual-root-syncd
+
+This is examnple config ::
+
+    dualroot = false
+    sync = [
+        ["/efi/EFI", "/mnt/root1/efi/"],
+        ["/boot", "/mnt/root1/", ["/boot/loader"]],
+        ["/bin", "/mnt/root1/"],
+        ["/lib", "/mnt/root1/"],
+        ["/lib64", "/mnt/root1/"],
+        #["/var", "/mnt/root1/", ["/var/cache/pacman/pkg"]],
+        ["/etc", "/mnt/root1/", ["/etc/fstab"]],
+        ["/srv", "/mnt/root1/" ],
+        ["/home", "/mnt/root1/" ],
+        ["/opt", "/mnt/root1/" ],
+        ]
+
+Note the example has exceptions to exclude */etc/fstab* and */boot/loader*
 
 
 Epilogue
@@ -705,10 +704,7 @@ on the arch general mail list [3]_.
 
 This brings me to a couple of todo items:
 
-**Todo** #1: Sync Tool Using Inotify
-    Build or use existing inotify tools to monitor an appropriate set of dirs to sync to the alternate. 
-
-**Todo** #2: Use same basic mechanism as Second Approach to do fast installs.
+**Todo** #1: Use same basic mechanism as Second Approach to do fast installs.
     Build a tool to do fresh installs from a template root drive.
 
 For an install, one can imagine doing pretty much same thing as the second approach,
