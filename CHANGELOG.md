@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.0.3] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-03-10
+ - Readme tweaks, systemd unit description improvements  
+ - update CHANGELOG.md  
+
 ## [2.0.2] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-03-09
  - Doc wordsmithing  
  - Wordsmithing README  
