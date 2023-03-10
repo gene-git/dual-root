@@ -1,5 +1,5 @@
 [Unit]
-Description=Dual Bind mount currently booted <esp> to /boot
+Description=Bind mount currently booted <esp> to /boot
 ConditionPathExists=/usr/bin/dual-root-tool
 DefaultDependencies=no
 Conflicts=shutdown.target

@@ -65,13 +65,17 @@ The 2 approaches outlined here both use:
  perform various sync operations either one off or as a daemon using inotify to detect
  changes in the filessystem.
 
-First Approach:  [1]_
- * Best Approach [2]_
+First Approach Summary [1]_ :
+-----------------------------
+
+2 disks each with 2 required partitions: <esp> and root. The 2 <esp>s are autonaticaly syncronized,
+and the 2 root partitions are joined using raid1
+
+ * Best Approach when possible [2]_
  * Best suited :
 
    * fresh installs
-   * new install takes longer
-   * use backup of existing root drive to minimize downtime
+
 
  * sync list:
 
@@ -89,6 +93,10 @@ First Approach:  [1]_
 
    * identifies booted <esp> and sync's other <esp>s from current <esp>
 
+ * new install takes longer
+
+   * use backup of existing root drive to minimize downtime
+
 For those who prefer to keep their kernels on a linux filesystem,
 it is easy enough to use a separate /boot partition of type XBOODLDR.
 These would need to be added to sync config to be included.
@@ -101,11 +109,16 @@ type XBOOTLDR it may or may not work - so untested. It is certainly simpler
 to leave them all on the <esp>
 
 
-Second Approach:
+Second Approach Summary:
+--------------------------
+
+2 disks each with <esp> and root patition(s). The 2 <esp>s are kept synchroniuzed and
+each directory on the "root" partition is also kept synchronized.
+
  * best suited :
    
    * upgrade existing system with minimal changes
-   * using 1 SSD + 1 spinner, and want to keep primary boot on SSD
+   * using 1 SSD + 1 spinner, and keeping primary boot from the fast SSD
 
  * sync list:  
 
@@ -115,8 +128,9 @@ Second Approach:
      What I do is keep these on separate RAID-6 and bind mount them into var
 
  * Short Downtime only to install 2nd disk.  Configure while running normally.
- * Each disk has its own /boot, and thus different UUID and thus different
-   boot loader config UUIDs - so these need to be excluded from sync.
+ * Each disk has its own root UUID and thus different boot loader config UUIDs - 
+   so these need to be excluded from sync. Likewise there are now
+   1 fstab on each drive, and this too needs to be excluded.
 
 
 We use Archlinux but the distro shouldn't play any significant role in dual root setup. 
@@ -125,8 +139,8 @@ We find the Arch rolling release distro convenient and robust.
 One of the beautiful things about linux is that, more often than not, there is more than
 one way to do things.  And here are two ways :)
 
-First Approach
-================
+First Approach - details
+=========================
 
 Each of the two disks to be used needs its own <esp> and root partitions.
 The currently booted <esp> will be mounted as /boot. Actually the <esp>'s are
@@ -424,8 +438,8 @@ And add the other partition back into the raid. Sync daemon will update the new 
 
 Thats it - back in business!!
 
-Second Approach
-===============
+Second Approach - details
+=========================
 
 
 For convenience,  we partition each disk the same way. 
