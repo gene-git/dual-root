@@ -9,6 +9,17 @@ import signal
 import subprocess
 from select import select
 
+def _terminate_w_signals(pid):
+    """ try sigterm then sigkill if needed """
+    if pid is not None:
+        try:
+            os.kill(pid, signal.SIGTERM)
+        except OSError:
+            try:
+                os.kill(pid, signal.SIGKILL)
+            except OSError:
+                pass
+
 def terminate_one_inotify(pipe, pid):
     """
     When exiting, do what we can to shutdown all inotify processes.
@@ -21,15 +32,9 @@ def terminate_one_inotify(pipe, pid):
             try:
                 pipe.kill()
             except OSError:
-                pass
-    elif pid is not None:
-        try:
-            os.kill(pid, signal.SIGTERM)
-        except OSError:
-            try:
-                os.kill(pid, signal.SIGKILL)
-            except OSError:
-                pass
+                _terminate_w_signals(pid)
+    else :
+        _terminate_w_signals(pid)
 
 def catch_signals(sig_handler):
     """

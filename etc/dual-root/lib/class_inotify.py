@@ -25,11 +25,7 @@ class WatchItem:
         """
         Ensure child inotify process is temrminated
         """
-        if self.pipe or self.pid:
-            self.pipe.terminate()
-            if self.pipe.poll() is not None:
-                # didn't end so kill it
-                terminate_one_inotify(self.pipe, self.pid)
+        terminate_one_inotify(self.pipe, self.pid)
         self.pipe = None
         self.pid = None
 
