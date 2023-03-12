@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.1.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-03-12
+ - tidy / simplify inotify terminate() method.  
+ - readme tweaks  
+ - update CHANGELOG.md  
+
 ## [2.0.3] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-03-10
  - Readme tweaks, systemd unit description improvements  
  - update CHANGELOG.md  
