@@ -298,6 +298,13 @@ This is desribed in next section.
 Ths tool will handle mounting */boot* as well syncing the alternate efi partitions. 
 Handling this in a robust and safe way, was the most tricky part of the exercise! 
 
+Note on swap. 
+-------------
+While its generally better to use a dedicated partition for swap, if there is sufficient
+memory that swap will not really be used much, then it may be simpler to use a swap file
+kept on the root raid filesystem. This also has advantage that the fstab is now references
+a file which is same regardless which <esp> was booted.
+
 
 Mounting /boot 
 --------------
