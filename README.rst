@@ -60,7 +60,7 @@ The 2 approaches outlined here both use:
 
    * Assume refind or grub would work too. 
 
- We provide *dual-boot-tool* and systemd services to make it as straightforwards as possible to
+ We provide *dual-boot-tool* and systemd services to make it as straightforward as possible to
  implement. The tool can identify the currently booted <esp>, bind mount it to */boot* and
  perform various sync operations either one off or as a daemon using inotify to detect
  changes in the filessystem.
@@ -409,25 +409,25 @@ The to start the inotify based sync daemon simply run with *-sd * or *--syncd*::
 
     dual-root-tool -sd
 
-This will monitor the currently booted <esp> mountm, and whenever it gets
-a change event notification from inotify, it wil syn to the alternate one(s).
+This will monitor the currently booted <esp> mount, and whenever it gets
+a change event notification from inotify, it will sync the alternate one(s).
 You can run it in test mode *-t* - in this case it will print what it would do
-but doesn't copy - same as when running *-s -t*.
+but doesn't copy - similar to the testing behavior when running *-s -t*.
 
 In non-test mode you can touch a file and watch it appear in the alternate.
-The service unit file runs it in quiet mode (*-q -sd*).
+The service unit file runs in quiet mode (*-q -sd*).
 
-To use the systemd service unit is installed when using the scripts/do-install program
-into the usual */usr/lib/systemtd/system/dual-root-syncd.service*
+The systemd service unit is installed when using the scripts/do-install script
+into the usual */usr/lib/systemtd/system/dual-root-syncd.service* location.
 
-And start as usual::
+To use the sync service, enable start as usual::
 
     systemctl enable dual-root-syncd.service
     systemctl start dual-root-syncd.service
 
 
 This uses inotify to monitor */boot* for changes. Whenever a change event is detected, 
-it then calls *dual-root-tool -s* to sync the active <esp> to the alternate <esp>.
+it then calls on rsync to update any alternate <esp> from the currently booted <esp>
 
 How to Recover if 1 Disk Dies
 -----------------------------
