@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.1.1] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-04-26
+ - For Arch mkpkg users Add _mkpkg_depends to PKGBUILD so rebuilds package when python is updated  
+ - Add short note about swap file for approach 1.  
+ - update CHANGELOG.md  
+
 ## [2.1.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-03-12
  - tidy / simplify inotify terminate() method.  
  - readme tweaks  
