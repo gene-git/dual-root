@@ -189,7 +189,7 @@ extra space to create a *data* partition.
 
 Lets look at what we have and identify the UUIDs we'll need as well::
 
-    # lsblk f
+    # lsblk -f
     lsblk -f
     NAME   FSTYPE FSVER LABEL UUID                                 FSAVAIL FSUSE% MOUNTPOINTS
     sda
@@ -642,8 +642,7 @@ systemd-boot install
 All that's needed now is to install boot loader into the alternate <esp>. sd-boot makes this
 straightforward to do::
 
-   name='--efi-boot-option-description="02 Linux Boot Manager"'
-   bootctl --esp-path /mnt/root1/efi --boot-path /mnt/root1/boot $name install
+   bootctl --esp-path /mnt/root1/efi --boot-path /mnt/root1/boot --efi-boot-option-description="Linux Alt Boot Manager" install
 
 We specify a descriptive name, so that any system boot menu will show a different name 
 than the default used for the first disk. The name of either can be easily changed at any time.
