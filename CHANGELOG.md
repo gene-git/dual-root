@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.2.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-04-29
+ - Fix typo in error message  
+ - update CHANGELOG.md  
+
 ## [2.1.1] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-04-26
  - For Arch mkpkg users Add _mkpkg_depends to PKGBUILD so rebuilds package when python is updated  
  - Add short note about swap file for approach 1.  
