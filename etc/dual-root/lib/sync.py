@@ -31,7 +31,7 @@ def sync_one(sync_item, quiet, test):
 
         [retc, out, err] = run_prog(pargs)
         if retc != 0:
-            print(f'rsync failed: {sync_item.source} -> {dest}')
+            print(f'rsync failed: {sync_item.srv} -> {dest}')
             print(err)
         elif test and out:
             print(out)
