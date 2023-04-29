@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.3.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-04-29
+ - Fix typo when fixing previous typo ...  
+ - update CHANGELOG.md  
+
 ## [2.2.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-04-29
  - Fix typo in error message  
  - update CHANGELOG.md  
