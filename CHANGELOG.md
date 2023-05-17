@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.3.1] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-05-17
+ - Simplify Arch PKGBUILD and more closely follow arch guidelines  
+ - update CHANGELOG.md  
+
 ## [2.3.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-04-29
  - Fix typo when fixing previous typo ...  
  - update CHANGELOG.md  
