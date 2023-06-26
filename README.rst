@@ -22,10 +22,12 @@ March 9 2023:
 Goal
 ----
 The goal is a system which is resilient to a failure of the root drive.
-In the event of a root disk failure, an alternate root disk can be quickly deployed.
-We expect that the UEFI bios will boot the alternate disk if the first one is 
-unavailable - but one can always use the bios boot menu, the one that lets user choose which drive to
-boot, where both root disks should be offered. 
+In the event of a root disk failure, the alternate root disk will be automaticlly deployed.
+Ordinarily the UEFI bios will boot the alternate disk without any user interaction 
+should the one of the 2 disks become unavailable. If for some reason, that doesn't happen, 
+then one can always use the bios boot menu, the one that lets user choose which drive to
+boot, to choose which root to boot; under normal circumstances either drive can be booted
+from this menu.
 
 There are different ways to achieve this but they all share one key aspect which
 is having two drives with each drive having its own *<esp>*.
