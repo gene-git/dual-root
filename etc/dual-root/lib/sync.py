@@ -20,7 +20,8 @@ def sync_one(sync_item, quiet, test):
     for excl in sync_item.excl_list:
         rsync_opts += [f'--exclude={excl}']
 
-    rsync_opts += ['-axHAX', '--exclude=/lost+found/', '--delete']
+    #rsync_opts += ['-axHAX', '--exclude=/lost+found/', '--delete']
+    rsync_opts += ['-axHAX', '--no-specials', '--exclude=/lost+found/', '--delete']
     rsync = ['/usr/bin/rsync'] + rsync_opts
 
     for dest in sync_item.dst_list:
