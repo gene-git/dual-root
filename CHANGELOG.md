@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.4.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-06-26
+ - use --no-specials rsync option for the sync daemon  
+ - More word smithing on readme  
+ - update CHANGELOG.md  
+
 ## [2.3.2] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-06-26
  - minor readme tweak  
  - update CHANGELOG.md  
