@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.6.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-06-27
+ - new rsync additional options  
+   default base options: "-axHAX --no-specials" which can be changed in the config file  
+   always added to base: "--atimes --open-noatime --exclude=/lost+found/ --delete""  
+ - update CHANGELOG.md  
+
 ## [2.5.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-06-27
  - Add new variable rsync_opts to config file.  
    Defaults to "-axHAX --no-specials".  
