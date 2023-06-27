@@ -748,6 +748,9 @@ This is examnple sync daemon config ::
         ]
 
 Note the example has exclusions to exclude */etc/fstab* and */boot/loader*
+Note that the following rsync_options are always used in addition:
+
+    *--atimes --open-noatime --exclude=/lost+found/ --delete*
 
 Epilogue
 ========
