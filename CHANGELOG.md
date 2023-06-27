@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.5.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-06-27
+ - Add new variable rsync_opts to config file.  
+   Defaults to "-axHAX --no-specials".  
+ - update CHANGELOG.md  
+
 ## [2.4.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-06-26
  - use --no-specials rsync option for the sync daemon  
  - More word smithing on readme  
