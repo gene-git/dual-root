@@ -7,10 +7,19 @@
 # Optional file, can be empty.
 # * Source and destinations are passed to rsync and thus follow rsync conventions 
 #
-# Format is Key = Value. There are 2 keys :
-#  * dualroot = true/false
+# Format is Key = Value. There are 3 keys :
+#
+#  * dualroot = true/false      defaults to true
+#    Turn on to sync dual root case. 
+#    Set to false for 1st approach where root is raid array across both disks.
+#    Set to true for 2nd approach where each disk has a separate copy of root partition
+#
+#  * rsync_opts = xxx
+#    If not specified the deafult is : "-axHAX --no-specials"
+#    In addition these are always added: "--exclude=/lost+found/ --delete"
+#
 #  * sync = a list of one or more [source/dest/exclusions[
-# dest may optionally be a list - exclusions must be a list
+#    dest may optionally be a list - exclusions must be a list
 #
 # Approach 1:
 # ----------

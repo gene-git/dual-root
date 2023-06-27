@@ -7,21 +7,25 @@ import os
 from .utils import run_prog
 from .utils_block import mount_to_uuid
 
-def sync_one(sync_item, quiet, test):
+def sync_one(sync_item, rsync_opts_in, quiet, test):
     """
     Sync one SyncItem 
      - source/dest/exclusionsitems use rsync notation 
      - e.g. include trailing "/" if needed etc
+     - rsync_opts_in is either None or list of options
     """
-    rsync_opts = []
+    if rsync_opts_in and rsync_opts_in != []:
+        rsync_opts = rsync_opts_in
+    else:
+        rsync_opts = ['-axHAX', '--no-specials']
+
+    rsync_opts += ['--exclude=/lost+found/', '--delete']
     if test:
         rsync_opts += ['-nv']
 
     for excl in sync_item.excl_list:
         rsync_opts += [f'--exclude={excl}']
 
-    #rsync_opts += ['-axHAX', '--exclude=/lost+found/', '--delete']
-    rsync_opts += ['-axHAX', '--no-specials', '--exclude=/lost+found/', '--delete']
     rsync = ['/usr/bin/rsync'] + rsync_opts
 
     for dest in sync_item.dst_list:

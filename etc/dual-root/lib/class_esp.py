@@ -102,13 +102,18 @@ class EspInfo:
         self.dual_root_alt_mount_list = []      # alternate /efi<n>
         self.is_dual_root = False
 
+        self.sync_dual_root = False
+        self.sync_list = []
+        self.rsync_opts = None
+
 
         #
         # Load any sync daemon config
         #
-        (sync_dual_root, sync_list) = read_config(self.config_file)
-        self.sync_dual_root = sync_dual_root
-        self.sync_list = sync_list
+        config_dic = read_config(self.config_file)
+        self.sync_dual_root = config_dic['dualroot']
+        self.sync_list = config_dic['sync_list']
+        self.rsync_opts = config_dic['rsync_opts']
 
         self.efi_mount_uuid = mount_to_uuid(self.efi_mount)
         self.is_efi_mounted()
@@ -122,7 +127,7 @@ class EspInfo:
         #
         # Install and check sync list
         #
-        self.sync = Sync(self.sync_list, self.quiet, self.test)
+        self.sync = Sync(self.sync_list, self.rsync_opts, self.quiet, self.test)
         okay = self.sync.check()
         if not okay:
             self.okay = False

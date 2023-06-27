@@ -61,15 +61,25 @@ def read_config(config_file):
     """
     conf = read_toml_file(config_file)
 
-    dualroot = True
-    sync_list = []
+    conf_dic = {
+            'dualroot' : True,
+            'rsync_opts' : None,
+            'sync_list' : [],
+            }
+
     if conf:
         val = conf.get('dualroot')
         if val is not None:
-            dualroot = val
+            conf_dic['dualroot'] = val
+
+        val = conf.get('rsync_opts')
+        if val is not None:
+            conf_dic['rsync_opts'] = val.split()
 
         val = conf.get('sync')
         if val is not None:
+            sync_list = []
             _parse_sync_list(val, sync_list)
+            conf_dic['sync_list'] = sync_list
 
-    return (dualroot, sync_list)
+    return conf_dic

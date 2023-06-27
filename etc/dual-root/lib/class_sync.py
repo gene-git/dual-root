@@ -15,26 +15,28 @@ class SyncItem:
      - standard rsync options are common and not per item
     """
     # pylint: disable=R0903
-    def __init__(self, src, dst_list, excl_list, quiet, test):
+    def __init__(self, src, dst_list, excl_list, rsync_opts, quiet, test):
         self.quiet = quiet
         self.test = test
         self.src = src
         self.dst_list = dst_list
         self.excl_list = excl_list
+        self.rsync_opts = rsync_opts
 
     def sync(self):
         """
         sync myself
         """
-        sync_one(self, self.quiet, self.test)
+        sync_one(self, self.rsync_opts, self.quiet, self.test)
 
 class Sync:
     """
     little helper class for sync operations
     """
-    def __init__(self, sync_list, quiet, test):
+    def __init__(self, sync_list, rsync_opts, quiet, test):
         self.inotify = None
         self.sync_list = sync_list
+        self.rsync_opts = rsync_opts
         self.sync_items = []
         self._items_from_list(quiet, test)
 
@@ -49,7 +51,7 @@ class Sync:
                 excl_list= []
                 if len(list_item) > 2:
                     excl_list= list_item[2]
-                sync_item = SyncItem(src, dst_list, excl_list, quiet, test)
+                sync_item = SyncItem(src, dst_list, excl_list, self.rsync_opts, quiet, test)
                 self.sync_items.append(sync_item)
 
     def check(self):

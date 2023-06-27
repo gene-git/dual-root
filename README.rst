@@ -716,7 +716,8 @@ Finally, we need to keep the disks in sync.  The simplest way to do this is use 
 For this use case you can turn off the autosync which handles the first approach (using /efi0 /efi1 etc).
 Copy the sample config */etc/dual-root/sync-daemon.conf*. It has comments.
 Turn off the code that handles approach 1 by setting *dualroot = false* then make a list
-of items to sync. Each item will be used with rsync, and are therefore in rsync format
+of items to sync. By default, *dualroot* is true. 
+Each item will be used with rsync, and are therefore in rsync format
 (careful with trailing slashes!). Each item has [source_dir, dest_dir(s), exclusions].
 
 
@@ -731,7 +732,8 @@ It will print what will happen. Once you're happy,m then enable and start the da
 
 This is examnple sync daemon config ::
 
-    dualroot = false
+    # rsync_opts =          # default: if unset "-axHAX --no-specials"
+    dualroot = false        # default: true
     sync = [
         ["/efi/EFI", "/mnt/root1/efi/"],
         ["/boot", "/mnt/root1/", ["/boot/loader"]],
