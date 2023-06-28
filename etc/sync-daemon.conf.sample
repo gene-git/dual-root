@@ -15,8 +15,8 @@
 #    Set to true for 2nd approach where each disk has a separate copy of root partition
 #
 #  * rsync_opts = xxx
-#    If not specified the deafult is : "-axHAX --no-specials"
-#    In addition these are always added: "--atimes --open-noatime --exclude=/lost+found/ --delete"
+#    If not specified the deafult is : "-axHAXt"
+#    In addition these are always added: "--no-specials --atimes --open-noatime --exclude=/lost+found/ --delete"
 #
 #  * sync = a list of one or more [source/dest/exclusions[
 #    dest may optionally be a list - exclusions must be a list

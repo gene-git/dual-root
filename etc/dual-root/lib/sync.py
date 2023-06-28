@@ -17,9 +17,10 @@ def sync_one(sync_item, rsync_opts_in, quiet, test):
     if rsync_opts_in and rsync_opts_in != []:
         rsync_opts = rsync_opts_in
     else:
-        rsync_opts = ['-axHAX', '--no-specials']
+        rsync_opts = ['-axHAX']
 
-    rsync_opts += ['--atimes', '--open-noatime', '--exclude=/lost+found/', '--delete']
+    rsync_opts += ['--times', '--no-specials', '--atimes', '--open-noatime']
+    rsync_opts += ['--exclude=/lost+found/', '--delete']
     if test:
         rsync_opts += ['-nv']
 

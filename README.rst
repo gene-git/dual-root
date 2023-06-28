@@ -407,7 +407,7 @@ current booted esp - then use rsync to update the alternate <esp>. For example i
 current booted <esp> is mounted on */efi0*, and the alternate is on */efi1*,
 then you can update the latter using::
 
-    rsync -v -axHAX --exclude=/lost+found/ --delete /efi0/ /efi1/
+    rsync -v -axHAXt --exclude=/lost+found/ --delete /efi0/ /efi1/
 
 This can also done by using the sync option of the dual-root-tool.
 Lets run it in test mode where is simply shows what would be done::
@@ -424,10 +424,11 @@ The to start the inotify based sync daemon simply run with *-sd * or *--syncd*::
 
     dual-root-tool -sd
 
-This will monitor the currently booted <esp> mount, and whenever it gets
-a change event notification from inotify, it will sync the alternate one(s).
+This will sync once, then start the inotify based daemon to sync any changes thereafter.
+The sync daemon monitors the currently booted <esp> mount, and whenever it gets
+a change event notification from inotify, it will sync to the alternate.
 You can run it in test mode *-t* - in this case it will print what it would do
-but doesn't copy - similar to the testing behavior when running *-s -t*.
+but doesn't do any copy - similar to the testing behavior when running *-s -t*.
 
 In non-test mode you can touch a file and watch it appear in the alternate.
 The service unit file runs in quiet mode (*-q -sd*).
@@ -732,7 +733,7 @@ It will print what will happen. Once you're happy,m then enable and start the da
 
 This is examnple sync daemon config ::
 
-    # rsync_opts =          # default: if unset "-axHAX --no-specials"
+    # rsync_opts =          # default: if unset "-axHAX"
     dualroot = false        # default: true
     sync = [
         ["/efi/EFI", "/mnt/root1/efi/"],
@@ -748,9 +749,10 @@ This is examnple sync daemon config ::
         ]
 
 Note the example has exclusions to exclude */etc/fstab* and */boot/loader*
-Note that the following rsync_options are always used in addition:
+Note that the following rsync_options are always used in addition to above *rsync_opts*:
 
-    *--atimes --open-noatime --exclude=/lost+found/ --delete*
+    *--no-specials --atimes --open-noatime --exclude=/lost+found/ --delete*
+
 
 Epilogue
 ========

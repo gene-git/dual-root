@@ -99,10 +99,9 @@ def main():
         esp.bind_mount_efi()
 
     if conf["sync"]:
+        esp.sync_all_items()
         if conf["syncd"]:
             esp.sync_daemon_start()
-        else:
-            esp.sync_all_items()
 
 
 if __name__ == '__main__':
