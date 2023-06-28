@@ -1,5 +1,11 @@
 # Changelog
 
+## [2.7.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-06-28
+ - rsync options now adds --times --no-specials to rsync_opta  
+   Sync once before starting the inotify based sync daemon  
+   update README  
+ - update CHANGELOG.md  
+
 ## [2.6.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-06-27
  - new rsync additional options  
    default base options: "-axHAX --no-specials" which can be changed in the config file  
