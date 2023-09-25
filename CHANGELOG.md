@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.8.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-09-25
+ - sync code : remove obvious duplicate elements from rsync options list.  
+   We dont catch short vs long options or combined option flags such as "-t" vs "-atx"  
+ - update CHANGELOG.md  
+
 ## [2.7.0] ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ 2023-06-28
  - rsync options now adds --times --no-specials to rsync_opta  
    Sync once before starting the inotify based sync daemon  
