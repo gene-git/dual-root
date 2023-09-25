@@ -785,6 +785,7 @@ End Notes
 .. [3] https://lists.archlinux.org/archives/list/arch-general@lists.archlinux.org/thread/KAMOXQTWQCPCC5KNFF6IOUSFPMNMLIIW/
 .. [4] https://0pointer.net/blog/ 
 .. [5] Code on github and available as an Arch aur package.
+       https://github.com/gene-git/dual-root
        https://aur.archlinux.org/packages/dual-root
 
 License

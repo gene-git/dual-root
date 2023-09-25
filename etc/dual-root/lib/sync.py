@@ -20,10 +20,19 @@ def sync_one(sync_item, rsync_opts_in, quiet, test):
         rsync_opts = ['-axHAX']
 
     rsync_opts += ['--times', '--no-specials', '--atimes', '--open-noatime']
-    rsync_opts += ['--exclude=/lost+found/', '--delete']
+    rsync_opts += ['--delete']
     if test:
         rsync_opts += ['-nv']
 
+    #
+    # remove obvious dups 
+    # catch identical elements in the list.
+    #  - we miss short vs long options
+    #  - we miss "-t" in -axt  vs -t or -tax
+    #
+    rsync_opts = list(set(rsync_opts)) 
+
+    rsync_opts += ['--exclude=/lost+found/']
     for excl in sync_item.excl_list:
         rsync_opts += [f'--exclude={excl}']
 
