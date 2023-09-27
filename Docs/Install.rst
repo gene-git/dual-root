@@ -1,6 +1,5 @@
 .. SPDX-License-Identifier: MIT
 
-.. _install:
 
 ======================================
 Dual Root - Install

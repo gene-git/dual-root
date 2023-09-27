@@ -14,13 +14,13 @@ dest=${dest%/}          # strip any trailing /
 #
 # info
 #
-info="README.rst Install.rst CHANGELOG.md scripts packaging"
+info="README.rst Docs scripts packaging"
 infodir="usr/share/${self}"
 
 #
 # license
 #
-license="LICENSE"
+license="Docs/License.rst"
 licensedir="usr/share/licenses/${self}"
 
 #
@@ -35,13 +35,13 @@ unitdir='usr/lib/systemd/system/'
 conf='etc/sync-daemon.conf.sample'
 etc1='etc/dual-root/*py'
 etc2='etc/dual-root/lib/*py'
-#etc='dual-root-tool'
 etcdir='etc/dual-root'
 
 # apps
 apps=('dual-root-tool')
 
-# so can make app link in /usr/bin
+# make app link in /usr/bin
+# maybe move these to system site-directory
 
 if [ ! -d "$dest" ] ; then
     echo 'Missing destination directory'
@@ -53,8 +53,8 @@ else
     /usr/bin/rsync --mkpath -a ${conf} ${dest}/${etcdir}/
 
     # shared
-    /usr/bin/rsync --mkpath -a ${info} ${dest}/${infodir}
-    /usr/bin/rsync --mkpath -a ${license} ${dest}/${licensedir}/${license}
+    /usr/bin/rsync --mkpath -a ${info} ${dest}/${infodir}/
+    /usr/bin/rsync --mkpath -a ${license} ${dest}/${licensedir}/
     /usr/bin/rsync --mkpath -a ${conf} ${dest}/${infodir}/
 
     # systemd units 

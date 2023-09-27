@@ -502,19 +502,18 @@ partitioned - at least for the key partitions (esp, boot, root).
 .. table:: Sample Disk Partition
    :align: center
 
-
    +-------------+------+------------+--------------+--------------+--------------+
    | Partition   | size | GPT Type   | Label        | Mount        | Comment      |
    +=============+======+============+==============+==============+==============+
-   | 1           |   2G | EF00       | EFI          | /efi         |              |
+   | 1           |   2G | EF00       | EFI          | /efi         | -            |
    +-------------+------+------------+--------------+--------------+--------------+
    | 2           |   4G | EA00       | boot         | /boot        | XBOOTLDR     |
    +-------------+------+------------+--------------+--------------+--------------+
-   | 3           | 100G | 8300       | root         | /            |              |
+   | 3           | 100G | 8300       | root         | /            | -            |
    +-------------+------+------------+--------------+--------------+--------------+
-   | 4           |  16G | 8200       | swap         |              |              |
+   | 4           |  16G | 8200       | swap         | N/A          | -            |
    +-------------+------+------------+--------------+--------------+--------------+
-   | 5           | 128G | 8302       | home         | /home        |              |
+   | 5           | 128G | 8302       | home         | /home        | -            |
    +-------------+------+------------+--------------+--------------+--------------+
    | 6           | rest | 8300       | data         | /data        | if mounted   |
    +-------------+------+------------+--------------+--------------+--------------+
@@ -777,8 +776,6 @@ fast to get things installed.  Needs some scripting work and a good template mac
 
 End Notes
 =========
-
-.. _end-notes-1:
 
 .. [1] As discussed on Arch General Mail List [3]_ with thanks to Óscar Amor for the basic idea.
 .. [2] See Lennart Poettering's Blog "Linux Boot Partitions" [4]_
