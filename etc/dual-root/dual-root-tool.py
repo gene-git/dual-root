@@ -20,6 +20,7 @@
 
  GC 2023
 """
+# pylint: disable=invalid-name
 import argparse
 from lib import EspInfo
 
@@ -39,7 +40,7 @@ def parse_args():
 
     par = argparse.ArgumentParser(description=desc)
     par.add_argument('-b', '--bind', action='store_true', help='Bind mount active esp to efi mount')
-    par.add_argument('-s', '--sync', action='store_true', help='Sync active efi to alternate')
+    par.add_argument('-s', '--sync', action='store_true', help='Sync efi to alternate and any config sync dirs')
     par.add_argument('-sd','--syncd', action='store_true', help='Start sync daemon using inotify')
     par.add_argument('-t', '--test', action='store_true', help='Test mode')
     par.add_argument('-q', '--quiet', action='store_true', help='Quiet mode')

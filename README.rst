@@ -10,14 +10,28 @@ AKA hot spare bootable root disk
 NEW
 -----------
 
-March 9 2023:
+October 17 2024:
 
- * Sync option and sync daemon now support a config file with 
+ * Performance improvements:
+   
+   There are times when the sync daemon was using too much cpu/io.
+   This release improves on that.
 
-   * list of items in rsync format (source_directory, target_directorr(s), exclusions) 
-   * useful for the Second Approach or to have an additional directory kept in sync
+ * sync daemon now defaults to running with:
+   nice = 15
+   ionice class = IDLE
 
- * refactored and added new sync and inotify classes.
+ * Rsync requests triggered by inotify are now placed on a queue and run in a separate thread.
+   Queue is only run if sync_delay seconds have passsed since the last run and there
+   is no currently running sync.
+   Each queue is checked for pending sync requests periodicallyu (15 mins) and and pending
+   requests are handled by the queue runner. On exit a final
+   queue check is run. Each directory being monitored by inotify has a separate queue.
+   The sync_delay determines the minimum time between queue runs and defaults to 300 seconds.
+    
+ * These can all be changed in the sync-daemon.conf using variables:
+   nice, ionice_class and ionice_value for the realtime/best effort classes.
+   sync_delay - is the minimum number of seconds before any new queue run is done.
 
 Goal
 ----
@@ -734,6 +748,10 @@ This is examnple sync daemon config ::
 
     # rsync_opts =          # default: if unset "-axHAX"
     dualroot = false        # default: true
+    nice = 15               # default: 15
+    ionice_class = 3        # default: 3 (IDLE) see : man ioprio_set or man ionice
+    # ionice_value = 6      # only relevant for ionice_class realtime(1) and best-effort(2)
+    sync_delay = 60         # seconds to sleep after each rsync
     sync = [
         ["/efi/EFI", "/mnt/root1/efi/"],
         ["/boot", "/mnt/root1/", ["/boot/loader"]],

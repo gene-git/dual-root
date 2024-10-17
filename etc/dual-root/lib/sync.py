@@ -9,8 +9,8 @@ from .utils_block import mount_to_uuid
 
 def sync_one(sync_item, rsync_opts_in, quiet, test):
     """
-    Sync one SyncItem 
-     - source/dest/exclusionsitems use rsync notation 
+    Sync one SyncItem
+     - source/dest/exclusionsitems use rsync notation
      - e.g. include trailing "/" if needed etc
      - rsync_opts_in is either None or list of options
     """
@@ -25,12 +25,12 @@ def sync_one(sync_item, rsync_opts_in, quiet, test):
         rsync_opts += ['-nv']
 
     #
-    # remove obvious dups 
+    # remove obvious dups
     # catch identical elements in the list.
     #  - we miss short vs long options
     #  - we miss "-t" in -axt  vs -t or -tax
     #
-    rsync_opts = list(set(rsync_opts)) 
+    rsync_opts = list(set(rsync_opts))
 
     rsync_opts += ['--exclude=/lost+found/']
     for excl in sync_item.excl_list:

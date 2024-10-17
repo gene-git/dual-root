@@ -80,6 +80,7 @@ def inotify_event_handler(inotify):
      - Use pipe.stdout map to find associated sync_item from the file IO
        returned by select()
     """
+    # pylint: disable=too-many-branches
     watch_list = inotify.watch_list
     num_items = len(watch_list)
 
@@ -91,7 +92,6 @@ def inotify_event_handler(inotify):
     num_active = num_items
 
     while okay and num_active > 0 :
-
         #
         # Check which items are still active
         #
@@ -107,8 +107,16 @@ def inotify_event_handler(inotify):
         if num_active < 1:
             break
 
+        # Since rsync is run in own thread - there may be pending items in queue
+        # so we periodically (every 15 mins) request any pending sync get run
+        timeout = 15*60
         try:
-            (rdlist, _write, _err) = select(read_list, [],[])
+            (rdlist, _write, _err) = select(read_list, [],[], timeout)
+
+            if not rdlist:
+                # on timeout sync any pending items
+                for item in watch_list:
+                    item.sync_item.sync_pending()
 
             for stdout in rdlist:
                 watch = inotify.stdout_map[stdout]

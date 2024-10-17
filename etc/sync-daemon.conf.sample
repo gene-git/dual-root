@@ -21,8 +21,17 @@
 #  * sync = a list of one or more [source/dest/exclusions[
 #    dest may optionally be a list - exclusions must be a list
 #
+#  * nice = nicenes value for daemon (-20 - 20): default is 15
+#
+#  * ionice_class = ionice class (0-3) : default is 3 (IDLE)
+#
+#  * ionice_value = value for class (1,2 = realtime, best-effort) (0-7): default 6
+#
+#  * sync_delay - afte each rysnc sleep for sync_delay seconds
+#
 # Approach 1:
 # ----------
+#  2 disks - 2 EFI partitions - root is raid1 across the 2 drives
 #  Dont need this file at all unless there are additional things to sync other than /efi<n>
 #
 #  Using /efi0, /efi1, ... these are auto detected: 
@@ -31,6 +40,7 @@
 #
 # Approach 2:
 # ----------
+#  2 disks - 2 EFI - 2 copies of root
 #  Does not use /ef0, /efi1, ... 
 #  Set dualroot = false
 #  Add specific direcrories to sync. You will need exclusions here typically 
@@ -44,6 +54,9 @@
 # Example 1 : Approach Two 
 # -------------------------
 #   dualroot = false
+#   nice = 15
+#   ionice_class = 3
+#
 #            Source       Dest               Exclusions
 #   sync = [
 #           ["/efi/EFI",  "/mnt/root1/efi/"],

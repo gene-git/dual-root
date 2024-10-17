@@ -50,6 +50,13 @@ def _parse_sync_list(item, sync_list):
         for subitem in item:
             _parse_sync_list(subitem, sync_list)
 
+
+def _set_val(key:str, conf_file:dict, conf:dict):
+    ''' Use value from file if set '''
+    val = conf_file.get(key)
+    if val is not None:
+        conf[key] = val
+
 def read_config(config_file):
     """
     Read any sync daemon config
@@ -59,27 +66,38 @@ def read_config(config_file):
         list of source,dest,exclusions
         exclusions are optional, and dest can be a list
     """
-    conf = read_toml_file(config_file)
+    conf_file = read_toml_file(config_file)
 
-    conf_dic = {
+    #
+    # ionice default: none,0
+    #   - class: idle(3), none(0), best-effort(2), realtime(1)
+    #   - level: 0-7 (0=highest) for realtime and best-effort only
+    #
+    conf = {
             'dualroot' : True,
             'rsync_opts' : None,
+            'nice' : 19,
+            'ionice_class' : 3,         # 0=idle
+            'ionice_level' : 6,
+            'sync_delay' : 300,           # seconds to delay between pending rsync requests
             'sync_list' : [],
             }
 
-    if conf:
-        val = conf.get('dualroot')
-        if val is not None:
-            conf_dic['dualroot'] = val
+    if conf_file:
+        _set_val('dualroot', conf_file, conf)
+        _set_val('nice', conf_file, conf)
+        _set_val('ionice_class', conf_file, conf)
+        _set_val('ionice_level', conf_file, conf)
+        _set_val('sync_delay', conf_file, conf)
 
-        val = conf.get('rsync_opts')
+        val = conf_file.get('rsync_opts')
         if val is not None:
-            conf_dic['rsync_opts'] = val.split()
+            conf['rsync_opts'] = val.split()
 
-        val = conf.get('sync')
+        val = conf_file.get('sync')
         if val is not None:
             sync_list = []
             _parse_sync_list(val, sync_list)
-            conf_dic['sync_list'] = sync_list
+            conf['sync_list'] = sync_list
 
-    return conf_dic
+    return conf

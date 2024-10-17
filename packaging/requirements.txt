@@ -4,3 +4,4 @@ util-linux
 rsync
 inotify-tools
 tomli
+psutil

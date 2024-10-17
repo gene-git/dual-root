@@ -28,6 +28,7 @@ from .utils_block import mount_to_uuid
 from .utils_block import bind_mount
 from .config import read_config
 from .class_sync import Sync
+from .prio import Prio
 
 class Esp:
     """
@@ -81,6 +82,7 @@ class EspInfo:
      Support bind mounting current <esp> onto efi_mount (/boot)
      Support rsync current to alternate esp
     """
+    # pylint: disable=too-many-instance-attributes
     def __init__(self, conf):
         #
         # esp is the currently booted esp.
@@ -106,14 +108,20 @@ class EspInfo:
         self.sync_list = []
         self.rsync_opts = None
 
-
         #
         # Load any sync daemon config
         #
-        config_dic = read_config(self.config_file)
-        self.sync_dual_root = config_dic['dualroot']
-        self.sync_list = config_dic['sync_list']
-        self.rsync_opts = config_dic['rsync_opts']
+        config = read_config(self.config_file)
+        self.sync_dual_root = config['dualroot']
+        self.sync_list = config['sync_list']
+        self.rsync_opts = config['rsync_opts']
+
+        nice = config.get('nice')
+        ionice_class = config.get('ionice_class')
+        ionice_level = config.get('ionice_level')
+
+        prio = Prio(nice=nice, ionice_class=ionice_class, ionice_level=ionice_level)
+        prio.set_prio()
 
         self.efi_mount_uuid = mount_to_uuid(self.efi_mount)
         self.is_efi_mounted()
@@ -127,7 +135,10 @@ class EspInfo:
         #
         # Install and check sync list
         #
-        self.sync = Sync(self.sync_list, self.rsync_opts, self.quiet, self.test)
+        sync_delay = config.get('sync_delay')
+        if sync_delay is None:
+            sync_delay = 60
+        self.sync = Sync(self.sync_list, self.rsync_opts, sync_delay, self.quiet, self.test)
         okay = self.sync.check()
         if not okay:
             self.okay = False
@@ -252,6 +263,6 @@ class EspInfo:
         """
         Sunc Daemon:
          - Use inotify to monitor current efi and sync
-           alternates whenver change detected
+           alternates whenever change detected
         """
         self.sync.init_daemon()
