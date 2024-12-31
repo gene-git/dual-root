@@ -1,9 +1,8 @@
 # SPDX-License-Identifier: MIT
-# Copyright (c) 2023, Gene C
+# SPDX-FileCopyrightText: © 2023-present  Gene C <arch@sapience.com
 """
 Read sync daemon confix file
 """
-
 from .toml import read_toml_file
 
 def _elem_to_src_dst(item):

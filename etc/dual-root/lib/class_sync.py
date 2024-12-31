@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MIT
-# Copyright (c) 2023, Gene C
+# SPDX-FileCopyrightText: © 2023-present  Gene C <arch@sapience.com>
 """
   Dual Root Support 
   Simple class for handling sync (uses rsync)

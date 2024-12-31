@@ -7,10 +7,12 @@ Dual Root Capable Linux System
 AKA hot spare bootable root disk
 ---------------------------------
 
-NEW
------------
+NEW or Interesting
+------------------
 
-October 17 2024:
+ * All git tags are now signed with arch@sapience.com key which is available via WKD
+   or download from https://www.sapience.com/tech. Add the key to your package builder gpg keyring.
+   In PKGBUILD use source= line with *?signed* at the end. You can also manually verify the signature
 
  * Performance improvements:
    

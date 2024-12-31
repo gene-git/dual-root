@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MIT
-# Copyright (c) 2023, Gene C
+# SPDX-FileCopyrightText: © 2023-present  Gene C <arch@sapience.com>
 """
  Dual Root Tool
   Identify which <esp> was used to boot the currently running system.
