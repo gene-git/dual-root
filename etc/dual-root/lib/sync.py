@@ -3,53 +3,94 @@
 """
   Dual Root Support Utils
 """
+from typing import (List)
 import os
 from .utils import run_prog
 from .utils_block import mount_to_uuid
 
-def sync_one(sync_item, rsync_opts_in, quiet, test):
+
+def rsync_options_final(opts_in: List[str], test: bool = False) -> List[str]:
+    """
+    Given starting rsync options return full list of options to use.
+
+    Combiine caller provided with needed options.
+
+    -axHAX --times --no-specials --atimes --open-noatime --delete
+    """
+    opts: List[str] = []
+    if opts_in:
+        opts += opts_in
+
+    opts += ['--times', '--no-specials', '--atimes', '--open-noatime']
+    opts += ['--delete']
+
+    if test:
+        opts += ['-n', '-v']
+
+    #
+    # Duplicate options are benign.
+    # We remove obvious dups by catching
+    # identical elements in the list.
+    #  - we miss short vs long of same option
+    #
+    rsync_opts = list(set(opts))
+
+    #
+    # Split shor/long options and make each unique.
+    # All options with values take form : --xxx=yyy
+    # and will be kept together here.
+    # All short options are "-?" (no double dashes)
+    #
+    short_opts: List[str] = []
+    long_opts: List[str] = []
+    for opt in rsync_opts:
+        if opt[0:2] == '--':
+            long_opts.append(opt)
+        else:
+            for letter in opt[1:]:
+                short = '-' + letter
+                short_opts.append(short)
+
+    if short_opts:
+        short_opts = list(set(short_opts))
+
+    if long_opts:
+        long_opts = list(set(long_opts))
+
+    rsync_opts = short_opts + long_opts
+
+    return rsync_opts
+
+
+def sync_one(sync_item, quiet):
     """
     Sync one SyncItem
      - source/dest/exclusionsitems use rsync notation
      - e.g. include trailing "/" if needed etc
      - rsync_opts_in is either None or list of options
     """
-    if rsync_opts_in and rsync_opts_in != []:
-        rsync_opts = rsync_opts_in
-    else:
-        rsync_opts = ['-axHAX']
+    rsync_item = sync_item.rsync_item
 
-    rsync_opts += ['--times', '--no-specials', '--atimes', '--open-noatime']
-    rsync_opts += ['--delete']
-    if test:
-        rsync_opts += ['-nv']
-
-    #
-    # remove obvious dups
-    # catch identical elements in the list.
-    #  - we miss short vs long options
-    #  - we miss "-t" in -axt  vs -t or -tax
-    #
-    rsync_opts = list(set(rsync_opts))
-
+    rsync_opts = rsync_item.rsync_opts
     rsync_opts += ['--exclude=/lost+found/']
-    for excl in sync_item.excl_list:
+    for excl in rsync_item.excl:
         rsync_opts += [f'--exclude={excl}']
 
     rsync = ['/usr/bin/rsync'] + rsync_opts
 
-    for dest in sync_item.dst_list:
-        pargs = rsync + [f'{sync_item.src}', f'{dest}']
+    for dest in rsync_item.dst:
+        pargs = rsync + [f'{rsync_item.src}', f'{dest}']
         if not quiet:
             cmd = ' '.join(pargs)
             print(cmd)
 
-        [retc, out, err] = run_prog(pargs)
+        (retc, out, err) = run_prog(pargs)
         if retc != 0:
-            print(f'rsync failed: {sync_item.src} -> {dest}')
+            print(f'rsync failed: {rsync_item.src} -> {dest}')
             print(err)
-        elif test and out:
+        elif sync_item.test and out:
             print(out)
+
 
 def _check_sync_item(item, all_src, all_dst):
     """
@@ -62,7 +103,8 @@ def _check_sync_item(item, all_src, all_dst):
     """
     # pylint: disable=R0911,R0912
     if len(item) != 3:
-        print(f'Misformed sync item {item}. Should be [src, dest_list, excl_list]')
+        print(f'Malformed sync item {item}.')
+        print('Should be (src, dest_list, excl_list)')
         return False
 
     src = item[0]
@@ -81,7 +123,7 @@ def _check_sync_item(item, all_src, all_dst):
         if os.path.isdir(src):
             src_is_dir = True
     else:
-        print(f' *Error* : Watch source {src} doesnt exist')
+        print(f' *Error*: Watch source {src} doesnt exist')
         return False
 
     uuid_src = None
@@ -90,20 +132,23 @@ def _check_sync_item(item, all_src, all_dst):
 
     for dest in dest_list:
         if os.path.exists(dest):
-            if src_is_dir :
+            if src_is_dir:
                 if not os.path.isdir(dest):
-                    print(f' *Error* : Watch {src} is dir, dest {dest} must be dir')
+                    err = f'Watch {src} is dir, dest {dest} must be dir'
+                    print(f' *Error*: {err}')
                     return False
         else:
-            print(f' *Error* : Watch {src} to non-existent {dest}')
+            print(f' *Error*: Watch {src} to non-existent {dest}')
             return False
 
         if uuid_src and os.path.ismount(dest):
             uuid_dest = mount_to_uuid(dest)
             if uuid_src == uuid_dest:
-                print(f' *Error* : Watch dir {src} is same filesystem as dest {dest}')
+                err = f' Watch dir {src} is same filesystem as dest {dest}'
+                print(f' *Error*: {err}')
                 return False
     return True
+
 
 def check_sync_list(sync_list):
     """

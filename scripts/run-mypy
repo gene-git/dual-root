@@ -1,0 +1,7 @@
+#!/usr/bin/bash
+#
+# Run mypy on python source
+#
+cd etc/dual-root
+/usr/bin/mypy --check-untyped-defs --follow-untyped-imports dual-root-tool.py lib/*y
+

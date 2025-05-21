@@ -7,13 +7,19 @@ Dual Root Capable Linux System
 AKA hot spare bootable root disk
 ---------------------------------
 
+All git tags are now signed with arch@sapience.com key which is available via WKD
+or download from https://www.sapience.com/tech. Add the key to your package builder gpg keyring.
+The key is included in the Arch package and the source= line with *?signed* at the end can be used
+to verify the git tag.  You can also manually verify the signature
+
 NEW or Interesting
 ------------------
 
- * All git tags are now signed with arch@sapience.com key which is available via WKD
-   or download from https://www.sapience.com/tech. Add the key to your package builder gpg keyring.
-   The key is included in the Arch package and the source= line with *?signed* at the end can be used
-   to verify the git tag.  You can also manually verify the signature
+ * Code improvements:
+
+    * PEP-8, PEP-257, PEP-484 PEP-561 
+    * Simplify, Refactor code and rename when
+      it helps clarity.
 
  * Performance improvements:
    
@@ -373,7 +379,7 @@ far too complex for a bash script; though I am sure there are folks more skilled
 than me that could make a bash version.  
 
 I think it might be a good idea to have a version of dual-boot-tool 
-written in C++ or C at some point. That said, As of now, the python works, 
+written in C++,  Rust or C at some point. That said, as of now, the python works, 
 and besides, who doesn't have python installed these days!
 
 The *bind-mount-efi.service* uses *dual-root-tool* to do all the real work.
@@ -434,7 +440,7 @@ Lets run it in test mode where is simply shows what would be done::
 When ready you can remove the *-t* flag.
 
 This can be run manually at anytime or by using a pacman hook (Arch Linux) triggered by
-changes to /boot.  It can be run periodically from cront. 
+changes to /boot.  It can be run periodically from cron. 
 The best way way is to use inotify - this requires inotify-tools be installed.
 
 The to start the inotify based sync daemon simply run with *-sd * or *--syncd*::

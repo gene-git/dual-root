@@ -3,60 +3,62 @@
 """
   Dual Root Support Utils
 """
+from typing import (List, Tuple)
 import os
-from .utils import run_prog
+from .utils import run_cmd
 
-def device_to_uuid_mounts(dev):
+
+def device_to_uuid_mounts(dev: str) -> Tuple[str, List[str]]:
     """
     Support Esp class
     For block device /dev/xxx
-     - Get the UUID 
-     - Get list of all mount points 
+     - Get the UUID
+     - Get list of all mount points
     """
+
+    uuid = ''
+    mounts: List[str] = []
+
     if not dev:
-        return None
+        return (uuid, mounts)
 
     pargs = ['/usr/bin/lsblk', '-no', 'UUID,MOUNTPOINTS', dev]
-    [retc, result, _err] = run_prog(pargs)
+    result_lines = run_cmd(pargs)
 
-    if retc != 0:
+    if not result_lines:
         print(f'Failed to find uuid of {dev}')
-        return None
+        return (uuid, mounts)
 
-    uuid = None
-
-    result = result.splitlines()
-
-    mounts = []
-    for item in result:
-        item = item.split()
+    for line in result_lines:
+        item = line.split()
         if len(item) > 1:
             uuid = item[0]
             mount = item[1]
         else:
             mount = item[0]
         mounts.append(mount)
+
     return (uuid, mounts)
 
-def booted_esp_partuuid():
+
+def booted_esp_partuuid() -> str:
     """
     Identify partuuid of currently booted esp
      - Run efibootmgr to get partuuid
     """
+    partuuid = ''
 
-    partuuid = None
     pargs = ['/usr/bin/efibootmgr']
-    [retc, stdout, _stderr] = run_prog(pargs)
-    if retc != 0:
+    result_lines = run_cmd(pargs)
+    if not result_lines:
         print('Failed to run efibootmgr')
-        return None
+        return partuuid
 
     #
     # Find current bootnum
     #
-    stdout = stdout.splitlines()
-    bootnum = None
-    for row in stdout:
+    bootnum = ''
+    for row in result_lines:
         if row.startswith('BootCurrent:'):
             bootnum = row.split()[1]
             break
@@ -64,28 +66,27 @@ def booted_esp_partuuid():
     if not bootnum:
         # should never happen
         print('Failed to find current bootnum')
-        return None
+        return partuuid
 
     #
     # Find current boot info from bootnu
     #
     thisboot = f'Boot{bootnum}'
-    bootinfo = None
-    for row in stdout:
+    bootinfo = ''
+    for row in result_lines:
         if row.startswith(thisboot):
             bootinfo = row
             break
 
     if not bootinfo:
         print('Failed to find efibootmgr boot line with partuuid')
-        return None
+        return partuuid
 
     #
     # Extract the partuuid
     #
     # Line to parse: Bootxxx* <text> HD(n,GPT,partuuid,xxx,..)
     #
-    partuuid = None
     lsplit = bootinfo.split(',')
     if len(lsplit) >= 2:
         partuuid = lsplit[2]
@@ -95,11 +96,16 @@ def booted_esp_partuuid():
 
     return partuuid
 
-def partuuid_to_device(partuuid):
+
+def partuuid_to_device(partuuid: str) -> str:
     """
-    Get device associated with a partuuid
+    Get device path associated with a partuuid.
+
+    Returns:
+        str:
+        /dev/device_name
     """
-    device = None
+    device = ''
     by_puid_path = f'/dev/disk/by-partuuid/{partuuid}'
     if os.path.islink(by_puid_path):
         device = os.readlink(by_puid_path)
@@ -107,46 +113,45 @@ def partuuid_to_device(partuuid):
         device = f'/dev/{device}'
     return device
 
-def mount_to_uuid(mount_dir):
+
+def mount_to_uuid(mount_dir: str) -> str:
     """
     Get UUID of device mounted at mount_dir
     """
+    uuid = ''
     if not mount_dir:
-        return None
+        return uuid
 
     pargs = ['/usr/bin/lsblk', '-lno', 'UUID,MOUNTPOINTS']
-    [retc, result, _err] = run_prog(pargs)
+    result_lines = run_cmd(pargs)
 
-    if retc != 0:
+    if not result_lines:
         print(f'Failed to find any uuid of {mount_dir}')
-        return None
+        return uuid
 
-    result = result.splitlines()
-
-    uuid = None
-    for item in result:
+    for item in result_lines:
         items = item.split()
         if len(items) > 1:
             (this_uuid, this_mount) = items
             if this_mount == mount_dir:
                 uuid = this_uuid
                 break
-
     return uuid
 
-def bind_mount(src_dir, dest_dir):
+
+def bind_mount(src_dir: str, dest_dir: str):
     """
     Bind mount src_dir onto dest_dir
-     - must be root 
+     - must be root
      - does not check if dest_dir mounted already
      - NB os.path.ismount(path) is not reliable for bind mounts on same filesys
-       So we don't use this to check if already mounted. Caller 
+       So we don't use this to check if already mounted. Caller
        checks (see is_efi_mounted() method)
     """
     okay = True
     pargs = ['/usr/bin/mount', '--bind', src_dir, dest_dir]
-    [retc, _out, err] = run_prog(pargs)
-    if retc != 0:
-        print(f'Bind Mount failed {src_dir} -> {dest_dir}: {err}')
+    result = run_cmd(pargs)
+    if not result:
+        print(f'Bind Mount failed {src_dir} -> {dest_dir}')
         return not okay
     return okay
