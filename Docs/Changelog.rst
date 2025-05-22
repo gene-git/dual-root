@@ -7,12 +7,19 @@ Tags
 
 ::
 
-	0.2.0 (2023-03-06) -> 3.2.0 (2025-05-20)
-	73 commits.
+	0.2.0 (2023-03-06) -> 3.3.0 (2025-05-21)
+	75 commits.
 
 Commits
 =======
 
+
+* 2025-05-21  : **3.3.0**
+
+::
+
+                Use builtin types where possible. e.g. typing.List -> list
+ 2025-05-20     update Docs/Changelogs Docs/dual-root.pdf
 
 * 2025-05-20  : **3.2.0**
 
