@@ -22,7 +22,6 @@ But for now this works.
  GC 2023
 """
 # pylint: disable=too-few-public-methods
-from typing import (List)
 import os
 from .utils import os_scandir
 from .utils_block import device_to_uuid_mounts
@@ -46,9 +45,9 @@ class Esp:
         self.partuuid: str = ''
         self.uuid: str = ''
         self.mount: str = ''
-        self.mount_other: List[str] = []  # esp mounted other than /efiN
+        self.mount_other: list[str] = []  # esp mounted other than /efiN
         self.dev: str = ''
-        self.mount_list: List[str] = []
+        self.mount_list: list[str] = []
 
         self.uuid_and_mounts()
 
@@ -102,14 +101,14 @@ class EspInfo():
         self.conf = Config()
 
         self.esp: Esp = Esp()
-        self.esp_alt: List[Esp] = []
+        self.esp_alt: list[Esp] = []
 
         self.efi_mount_uuid: str = ''
         self.efi_mounted: bool = False
         self.efi_uuid_correct: bool = False
         self.euid: int = os.geteuid()
-        self.dual_root_mount_list: List[str] = []          # all /efi<n>
-        self.dual_root_alt_mount_list: List[str] = []      # alternate /efi<n>
+        self.dual_root_mount_list: list[str] = []          # all /efi<n>
+        self.dual_root_alt_mount_list: list[str] = []      # alternate /efi<n>
         self.is_dual_root: bool = False
 
         conf = self.conf
@@ -252,7 +251,7 @@ class EspInfo():
         for dest in self.dual_root_alt_mount_list:
             dest_list.append(f'{dest}/')
 
-        exclusions: List[str] = []
+        exclusions: list[str] = []
         sync_item = (f'{current_efi}/', dest_list, exclusions)
         self.sync.add_sync_list_items(self.conf, [sync_item])
 

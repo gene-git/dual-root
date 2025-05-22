@@ -6,7 +6,6 @@
 """
 # pylint: disable=too-few-public-methods
 # pylint: disable=too-many-arguments, too-many-positional-arguments
-from typing import (List)
 from .sync import (rsync_options_final, check_sync_list)
 from .class_inotify import Inotify
 from ._syncitem_base import (RsyncItem)
@@ -19,19 +18,19 @@ class Sync:
     """
     little helper class for sync operations
     """
-    #         sync_list: List[SyncListElem],
-    #         rsync_opts: List[str],
+    #         sync_list: list[SyncListElem],
+    #         rsync_opts: list[str],
     #         delay: float = 300,
     #         quiet: bool = False,
     #         test: bool = False):
     def __init__(self, conf: Config):
         """
         Args:
-            sync_list (List[src: str, dst: str or List[str], excl: List[str]]):
+            sync_list (List[src: str, dst: str or list[str], excl: list[str]]):
         """
         self.okay: bool = True
         self.inotify: Inotify
-        # self.sync_list: List[SyncListElem] = sync_list
+        # self.sync_list: list[SyncListElem] = sync_list
         self.sync_delay = conf.sync_delay
 
         #
@@ -44,7 +43,7 @@ class Sync:
         #
         # map sync list to sync_items
         #
-        self.sync_items: List[SyncItem] = []
+        self.sync_items: list[SyncItem] = []
         self.rsync_opts = rsync_options_final(conf.rsync_opts,
                                               test=conf.test)
 
@@ -52,14 +51,14 @@ class Sync:
 
     def _sync_list_to_items(self,
                             conf: Config,
-                            sync_list: List[SyncListElem]) -> List[SyncItem]:
+                            sync_list: list[SyncListElem]) -> list[SyncItem]:
         """
         create the list of SyncItems from input sync_list
         """
         quiet = conf.quiet
         test = conf.test
 
-        sync_items: List[SyncItem] = []
+        sync_items: list[SyncItem] = []
 
         if not sync_list:
             return sync_items
@@ -68,7 +67,7 @@ class Sync:
             src = list_item[0]
             dst = list_item[1]
 
-            excl: List[str] = []
+            excl: list[str] = []
             if len(list_item) > 2:
                 excl = list_item[2]
 
@@ -79,7 +78,7 @@ class Sync:
 
         return sync_items
 
-    def add_sync_list_items(self, conf: Config, sync_list: List[SyncListElem]):
+    def add_sync_list_items(self, conf: Config, sync_list: list[SyncListElem]):
         """
         Adds sync_items from sync list items.
 

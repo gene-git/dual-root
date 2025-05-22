@@ -3,12 +3,11 @@
 """
   Dual Root Support Utils
 """
-from typing import (List, Tuple)
 import os
 from .utils import run_cmd
 
 
-def device_to_uuid_mounts(dev: str) -> Tuple[str, List[str]]:
+def device_to_uuid_mounts(dev: str) -> tuple[str, list[str]]:
     """
     Support Esp class
     For block device /dev/xxx
@@ -17,7 +16,7 @@ def device_to_uuid_mounts(dev: str) -> Tuple[str, List[str]]:
     """
 
     uuid = ''
-    mounts: List[str] = []
+    mounts: list[str] = []
 
     if not dev:
         return (uuid, mounts)

@@ -3,13 +3,12 @@
 """
   Dual Root Support Utils
 """
-from typing import (List)
 import os
 from .utils import run_prog
 from .utils_block import mount_to_uuid
 
 
-def rsync_options_final(opts_in: List[str], test: bool = False) -> List[str]:
+def rsync_options_final(opts_in: list[str], test: bool = False) -> list[str]:
     """
     Given starting rsync options return full list of options to use.
 
@@ -17,7 +16,7 @@ def rsync_options_final(opts_in: List[str], test: bool = False) -> List[str]:
 
     -axHAX --times --no-specials --atimes --open-noatime --delete
     """
-    opts: List[str] = []
+    opts: list[str] = []
     if opts_in:
         opts += opts_in
 
@@ -41,8 +40,8 @@ def rsync_options_final(opts_in: List[str], test: bool = False) -> List[str]:
     # and will be kept together here.
     # All short options are "-?" (no double dashes)
     #
-    short_opts: List[str] = []
-    long_opts: List[str] = []
+    short_opts: list[str] = []
+    long_opts: list[str] = []
     for opt in rsync_opts:
         if opt[0:2] == '--':
             long_opts.append(opt)

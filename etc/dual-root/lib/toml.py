@@ -4,17 +4,17 @@
 toml helper functions
  - python >= 3.11 has support for toml read.
 """
-from typing import (Any, Dict)
+from typing import (Any)
 import os
 import tomllib as toml
 from .utils import open_file
 
 
-def read_toml_file(fpath: str) -> Dict[str, Any]:
+def read_toml_file(fpath: str) -> dict[str, Any]:
     """
     read toml file and return a dictionary
     """
-    this_dict: Dict[str, Any] = {}
+    this_dict: dict[str, Any] = {}
 
     if os.path.exists(fpath):
         fobj = open_file(fpath, 'r')

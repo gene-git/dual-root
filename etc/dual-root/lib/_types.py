@@ -1,5 +1,6 @@
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: © 2023-present  Gene C <arch@sapience.com>
 """
 Convenience Types
 """
-from typing import (List, Tuple)
-type SyncListElem = Tuple[str, List[str], List[str]]
+type SyncListElem = tuple[str, list[str], list[str]]

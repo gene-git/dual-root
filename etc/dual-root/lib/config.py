@@ -1,22 +1,24 @@
+# SPDX-License-Identifier: MIT
+# SPDX-FileCopyrightText: © 2023-present  Gene C <arch@sapience.com>
 """
 Command line options
 """
 # pylint: disable=too-many-instance-attributes, too-few-public-methods
-from typing import (Any, List, Dict, Tuple)
+from typing import (Any)
 import argparse
 
 from ._read_config import read_config
 
-type _Opt = Tuple[str | Tuple[str, str] | Tuple[str, str, str], Dict[str, Any]]
-type SyncListElem = Tuple[str, List[str], List[str]]
+type _Opt = tuple[str | tuple[str, str] | tuple[str, str, str], dict[str, Any]]
+type SyncListElem = tuple[str, list[str], list[str]]
 
 
-def _avail_options(conf_file: str, efi_mount: str) -> List[_Opt]:
+def _avail_options(conf_file: str, efi_mount: str) -> list[_Opt]:
     """
     List of command line options for argparse
     """
 
-    opts: List[_Opt] = []
+    opts: list[_Opt] = []
 
     opts.append((('-b', '--bind'),
                  {'action': 'store_true',
@@ -82,12 +84,12 @@ class Config:
         # config file
         #
         self.dualroot: bool = True
-        self.rsync_opts: List[str] = []
+        self.rsync_opts: list[str] = []
         self.nice: int = 19
         self.ionice_class: int = 3  # 0=idle
         self.ionice_level: int = 6
         self.sync_delay: float = 300
-        self.sync_list: List[SyncListElem] = []
+        self.sync_list: list[SyncListElem] = []
 
         #
         # command line

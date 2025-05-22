@@ -6,7 +6,7 @@ Dual Root - Sync Inotify support tools
 See class_inotify::Inotify
 """
 # pylint: disable=
-from typing import (Callable)
+from collections.abc import (Callable)
 from types import FrameType
 import os
 import signal

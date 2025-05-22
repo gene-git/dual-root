@@ -4,7 +4,6 @@
  Dual Root - Inotify Class
 """
 # pylint: disable=global-statement
-from typing import (Dict, List)
 from types import FrameType
 import atexit
 from select import select
@@ -49,7 +48,7 @@ class WatchItem:
             print(f'Warning: inotify on {watched} failed')
 
 
-WatchList: List[WatchItem] = []
+WatchList: list[WatchItem] = []
 
 
 def inotify_signal_handler(_sig_num: int, _sig_frame: FrameType | None):
@@ -77,8 +76,8 @@ class Inotify:
          stdout_map maps(pipe.stdout -> watch item)
         """
         global WatchList
-        self.watch_list: List[WatchItem] = []
-        self.stdout_map: Dict[int, WatchItem] = {}
+        self.watch_list: list[WatchItem] = []
+        self.stdout_map: dict[int, WatchItem] = {}
 
         WatchList = self.watch_list
         catch_signals(inotify_signal_handler)

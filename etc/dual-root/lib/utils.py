@@ -4,7 +4,8 @@
   Dual Root Support Utils
   GC 2023
 """
-from typing import (IO, Iterator, List, Tuple)
+from typing import (IO)
+from collections.abc import Iterator
 import os
 import subprocess
 from subprocess import SubprocessError
@@ -37,10 +38,10 @@ def open_file(path: str, mode: str) -> IO | None:
     return fobj
 
 
-def run_prog(pargs,
+def run_prog(pargs: list[str],
              input_str: str = '',
              stdout: int = subprocess.PIPE,
-             stderr: int = subprocess.PIPE) -> Tuple[int, str, str]:
+             stderr: int = subprocess.PIPE) -> tuple[int, str, str]:
     """
     run external program
     """
@@ -71,21 +72,21 @@ def run_prog(pargs,
     return (retc, output, errors)
 
 
-def run_cmd(pargs: List[str]) -> List[str]:
+def run_cmd(pargs: list[str]) -> list[str]:
     """
     Run cmd with provided arguments and return stdout.
 
     Variation of run_prog with simpler calling convention.
     Args:
-        pargs (List[str]):
+        pargs (list[str]):
         Standard list of command and arguments.
     Returns:
-        List[str]:
-        List of lines of stdout from running program.
+        list[str]:
+        list of lines of stdout from running program.
         May be empty list.
 
     """
-    result: List[str] = []
+    result: list[str] = []
 
     (ret, out, err) = run_prog(pargs)
     if ret != 0:

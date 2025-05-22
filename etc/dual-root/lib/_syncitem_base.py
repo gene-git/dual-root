@@ -5,7 +5,6 @@
   Simple class for handling sync (uses rsync)
 """
 # pylint: disable=too-few-public-methods
-from typing import (List)
 import threading
 
 
@@ -17,25 +16,25 @@ class RsyncItem:
         src (str):
             source to be copies
 
-        dst (str | List[str]):
+        dst (str | list[str]):
             Destination - can be list.
 
-        excl (List[str]):
-            List of exclusions not to copy
+        excl (list[str]):
+            list of exclusions not to copy
 
         rsync_opts (str):
             Options to use with rsync.
     """
     def __init__(self,
                  src: str,
-                 dst: str | List[str],
-                 excl: List[str],
-                 rsync_opts: List[str]
+                 dst: str | list[str],
+                 excl: list[str],
+                 rsync_opts: list[str]
                  ):
         self.src: str = src
-        self.dst: str | List[str] = dst
-        self.rsync_opts: List[str] = rsync_opts
-        self.excl: List[str] = excl
+        self.dst: str | list[str] = dst
+        self.rsync_opts: list[str] = rsync_opts
+        self.excl: list[str] = excl
 
 
 class SyncItemBase:

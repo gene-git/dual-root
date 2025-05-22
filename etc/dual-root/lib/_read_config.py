@@ -3,7 +3,8 @@
 """
 Read sync daemon confix file
 """
-from typing import (Any, Dict, List, Sequence)
+from typing import (Any)
+from collections.abc import Sequence
 from .toml import read_toml_file
 
 from ._types import SyncListElem
@@ -22,13 +23,13 @@ def _elem_to_src_dst(item) -> SyncListElem:
 
         src: str = item[0]
 
-        dst: List[str]
+        dst: list[str]
         if isinstance(item[1], list):
             dst = item[1]
         else:
             dst = [item[1]]
 
-        excl: List[str] = []
+        excl: list[str] = []
         if len(item) > 2:
             excl = item[2]
 
@@ -37,7 +38,7 @@ def _elem_to_src_dst(item) -> SyncListElem:
     return src_dst_excl
 
 
-def _parse_sync_list(item: Sequence[str | List[str]]) -> List[SyncListElem]:
+def _parse_sync_list(item: Sequence[str | list[str]]) -> list[SyncListElem]:
     """
     Takes conf file input and maps it to
     list of (src, dst, excl)
@@ -48,7 +49,7 @@ def _parse_sync_list(item: Sequence[str | List[str]]) -> List[SyncListElem]:
        [src, dst, excl],
        ]
     """
-    sync_list: List[SyncListElem] = []
+    sync_list: list[SyncListElem] = []
 
     if not item or not isinstance(item, list):
         return sync_list
@@ -69,7 +70,7 @@ def _parse_sync_list(item: Sequence[str | List[str]]) -> List[SyncListElem]:
     return sync_list
 
 
-def _set_val(key: str, conf_file: Dict[str, Any], conf: Dict[str, Any]):
+def _set_val(key: str, conf_file: dict[str, Any], conf: dict[str, Any]):
     """
     Use value from file if set
     """
@@ -78,7 +79,7 @@ def _set_val(key: str, conf_file: Dict[str, Any], conf: Dict[str, Any]):
         conf[key] = val
 
 
-def read_config(config_file) -> Dict[str, Any]:
+def read_config(config_file) -> dict[str, Any]:
     """
     Read any sync daemon config
     Keys:
@@ -94,8 +95,8 @@ def read_config(config_file) -> Dict[str, Any]:
     #   - class: idle(3), none(0), best-effort(2), realtime(1)
     #   - level: 0-7 (0=highest) for realtime and best-effort only
     # sync_delay - seconds between pending rsync requests
-    sync_list: List[SyncListElem] = []
-    rsync_opts: List[str] = ["-axHAXt"]
+    sync_list: list[SyncListElem] = []
+    rsync_opts: list[str] = ["-axHAXt"]
     conf = {
             'dualroot': True,
             'rsync_opts': rsync_opts,
@@ -126,7 +127,7 @@ def read_config(config_file) -> Dict[str, Any]:
         # dest is a path string or list of paths
         # excludes is a list of strings.
         # Map to list of tuples:
-        #   (src: str, dst: List[stre], exclude: List[str])
+        #   (src: str, dst: list[stre], exclude: list[str])
         #
         val = conf_file.get('sync')
         if val is not None:
