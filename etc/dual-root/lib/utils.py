@@ -10,6 +10,8 @@ import os
 import subprocess
 from subprocess import SubprocessError
 
+from .run_prog import run_prog
+
 
 def os_scandir(tdir: str) -> Iterator[os.DirEntry] | None:
     """
@@ -36,40 +38,6 @@ def open_file(path: str, mode: str) -> IO | None:
         print(f'Error opening file {path}: {err}')
         fobj = None
     return fobj
-
-
-def run_prog(pargs: list[str],
-             input_str: str = '',
-             stdout: int = subprocess.PIPE,
-             stderr: int = subprocess.PIPE) -> tuple[int, str, str]:
-    """
-    run external program
-    """
-    if not pargs:
-        return (0, '', 'Missing pargs')
-
-    bstring: bytes | None = None
-    if input_str:
-        bstring = bytearray(input_str, 'utf-8')
-
-    try:
-        ret = subprocess.run(pargs, input=bstring, stdout=stdout,
-                             stderr=stderr, check=False)
-
-    except (FileNotFoundError, SubprocessError) as err:
-        return (-1, '', str(err))
-
-    retc = ret.returncode
-    output = ''
-    errors = ''
-
-    if ret.stdout:
-        output = str(ret.stdout, 'utf-8', errors='ignore')
-
-    if ret.stderr:
-        errors = str(ret.stderr, 'utf-8', errors='ignore')
-
-    return (retc, output, errors)
 
 
 def run_cmd(pargs: list[str]) -> list[str]:

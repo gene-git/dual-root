@@ -4,7 +4,7 @@
   Dual Root Support Utils
 """
 import os
-from .utils import run_prog
+from .run_prog import run_prog
 from .utils_block import mount_to_uuid
 
 
