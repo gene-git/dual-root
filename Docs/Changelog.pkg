@@ -1,0 +1,28 @@
+-------------------------------------------------------
+ Changelog    : dual-root
+ Tags         : 3.2.0 ➙ 3.6.0
+              : 2025-05-20 ➙ 2025-06-26
+              : 6 tags. See Docs for full changelog
+-------------------------------------------------------
+
+ 2025-06-26   : 3.6.0
+                Update to latest run_prog() from pyconcurent
+ 2025-06-22     update Docs/Changelogs Docs/dual-root.pdf
+
+ 2025-06-22   : 3.5.0
+                Pull local copy of latest run_prog from pyconcurrent
+ 2025-06-20     update Docs/Changelogs Docs/dual-root.pdf
+
+ 2025-06-20   : 3.4.0
+                Pull local copy of latest run_prog from pyconcurrent
+ 2025-05-21     update Docs/Changelogs Docs/dual-root.pdf
+
+ 2025-05-21   : 3.3.0
+                Use builtin types where possible. e.g. typing.List -> list
+ 2025-05-20     update Docs/Changelogs Docs/dual-root.pdf
+
+ 2025-05-20   : 3.2.0
+                Code improvements:
+                  PEP-8, PEP-257, PEP-484 PEP-561
+                  Simplify, Refactor code and rename when it helps clarity.
+ 2024-12-31     update Docs/Changelog Docs/dual-root.pdf

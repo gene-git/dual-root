@@ -7,12 +7,19 @@ Tags
 
 ::
 
-	0.2.0 (2023-03-06) -> 3.5.0 (2025-06-22)
-	79 commits.
+	0.2.0 (2023-03-06) -> 3.6.0 (2025-06-26)
+	81 commits.
 
 Commits
 =======
 
+
+* 2025-06-26  : **3.6.0**
+
+::
+
+                Update to latest run_prog() from pyconcurent
+ 2025-06-22     update Docs/Changelogs Docs/dual-root.pdf
 
 * 2025-06-22  : **3.5.0**
 
